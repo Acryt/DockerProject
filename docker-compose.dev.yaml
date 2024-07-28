@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  frontend:
+    command: npm run start
+  api:
+    command: npm run dev
+    volumes:
+      - ./api/src:/usr/src/app/src
+ 
