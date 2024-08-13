@@ -17,21 +17,21 @@ app.get("/", (req, res) => {
 	);
 });
 
-app.get("/api/testData", (req, res) => {
-	axios.get(apiUrl + "/apiData").then((response) => {
-		res.json({
-			test: true,
-			testData: response.data,
-		});
-	});
-});
+// app.get("/testData", (req, res) => {
+// 	axios.get(apiUrl + "/apiData").then((response) => {
+// 		res.json({
+// 			test: true,
+// 			testData: response.data,
+// 		});
+// 	});
+// });
 
-app.get("/api/currentUser", (req, res) => {
-	res.json({
-		id: "1",
-		email: "Lh5yN@example.com",
-	});
-});
+// app.get("/api/currentUser", (req, res) => {
+// 	res.json({
+// 		id: "1",
+// 		email: "Lh5yN@example.com",
+// 	});
+// });
 
 connectDB()
 	.on("error", console.log)

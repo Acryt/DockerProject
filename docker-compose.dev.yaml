@@ -1,10 +1,20 @@
-version: '3.9'
-
 services:
   frontend:
+    build:
+      context: ./frontts
+      dockerfile: Dockerfile.prod
     command: npm run start
+
   api:
     command: npm run dev
     volumes:
       - ./api/src:/usr/src/app/src
  
+  auth:
+    command: npm run dev 
+    volumes:
+      - ./auth/src:/usr/src/app/src
+ 
+  nginx:
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/conf.d/nginx.conf

@@ -4,28 +4,41 @@ const axios = require("axios");
 const { connectDB } = require("./helpers/db");
 const { port, host, db, authApiUrl } = require("./config");
 const app = express();
-const postSchema = new mongoose.Schema({
-	name: String,
+const votesShchema = new mongoose.Schema({
+	title: { type: String },
+	date: { type: Date, default: new Date() },
+	status: { type: String },
+	candidates: [{ candidateName: { type: String } }],
+	tickets: [{ ticket: { type: String }, vote: { type: String } }],
 });
-const Post = mongoose.model("Post", postSchema);
+const Vote = mongoose.model("Vote", votesShchema);
+
+app.use(express.json());
 
 const startServer = () => {
 	app.listen(port, async () => {
-		console.log(`Start on ${host}:${port}`);
-		console.log(`${db}`);
+		console.log(`---START---`);
 
-		const silence = new Post({ name: "Silence" });
-		await silence.save();
-		const kittens = await Post.find();
-		console.log(kittens);
-		Post.deleteMany({ name: "Silence" })
-			.then(function () {
-				console.clear();
-				console.log("Silence deleted");
-			})
-			.catch(function (error) {
-				console.log(error);
-			});
+		const silence = new Vote({
+			title: "Silence",
+			date: Date.now(),
+			status: "active",
+			candidates: [
+				{
+					candidateName: "Silence",
+				},
+				{
+					candidateName: "Stealth",
+				},
+			],
+			tickets: [
+				{
+					ticket: "43242",
+					vote: "Silence",
+				},
+			],
+		});
+		// await silence.save();
 	});
 };
 
@@ -35,21 +48,33 @@ app.get("/", (req, res) => {
 	);
 });
 
-app.get("/api/apiData", (req, res) => {
-	res.send({
-		testData: true,
-		asd: "asd",
-	})
+app.get("/getData", async (req, res) => {
+	let x = await Vote.find();
+	res.send(x);
 });
 
-app.get("/testCurrentUser", (req, res) => {
-	axios.get(authApiUrl + "/currentUser").then((response) => {
-		res.json({
-			testCurrentUser: true,
-			user: response.data,
+app.post("/postData", async (req, res) => {
+	try {
+		const x = new Vote(req.body);
+		console.log(JSON.stringify({ x }));
+		await x.save();
+		res.send({ message: "ok" });
+	} catch (error) {
+		res.status(500).send({
+			message: "Error saving vote to database",
+			error: error,
 		});
-	});
+	}
 });
+
+// app.get("/testCurrentUser", (req, res) => {
+// 	axios.get(authApiUrl + "/currentUser").then((response) => {
+// 		res.json({
+// 			testCurrentUser: true,
+// 			user: response.data,
+// 		});
+// 	});
+// });
 
 connectDB()
 	.on("error", console.log)

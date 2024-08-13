@@ -1,59 +1,65 @@
-version: '3.9'
-
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontts
+      dockerfile: Dockerfile.prod
     container_name: fp-frontend
-    command: serve -s build -l 3000
-    ports:
-      - "3000:3000"
+    command: serve -s build
     restart: unless-stopped
     stdin_open: true
     tty: true
     volumes:
-      - ./frontend/src:/usr/src/app/src
+      - ./frontts/src:/usr/src/app/src
+    ports:
+      - 3000:3000
+    networks:
+      - fp-network
 
   api:
     build: ./api
     container_name: fp-api
     command: npm run start
     restart: unless-stopped
-    ports:
-      - "3001:3001"
     environment:
       - PORT=3001
-      - HOST=http://localhost
+      # - HOST=http://localhost
       - MONGO_URL=mongodb://api_db:27017/api
       - AUTH_API_URL=http://auth:3002/api
     depends_on:
       - api_db
+    networks:
+      - fp-network
 
   auth:
     build: ./auth
     container_name: fp-auth
     command: npm run start
     restart: unless-stopped
-    ports:
-      - "3002:3002"
     environment:
       - PORT=3002
-      - HOST=http://localhost
+      # - HOST=http://localhost
       - MONGO_URL=mongodb://auth_db:27017/auth
       - API_URL=http://api:3001/api
     depends_on:
       - auth_db
+    networks:
+      - fp-network
 
   api_db:
     image: mongo:latest
     container_name: fp-api-db
     volumes:
       - mongodb_api:/data/db
+    networks:
+      - fp-network
 
   auth_db:
     image: mongo:latest
     container_name: fp-auth-db
     volumes:
       - mongodb_auth:/data/db
+    networks:
+      - fp-network
 
   nginx:
     image: nginx:stable-alpine
@@ -66,6 +72,12 @@ services:
       - frontend
       - api
       - auth
+    networks:
+      - fp-network
+
+networks:
+  fp-network:
+    driver: bridge
 
 volumes:
   mongodb_api:

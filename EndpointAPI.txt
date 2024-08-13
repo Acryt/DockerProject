@@ -1,0 +1,11 @@
+Структура бд:
+
+
+-- Votes (voteID, date, status)
+|-- Candidates (candidateID, candidateName)
+|
+|-- Tickets (ticketID, ticket, vote)
+
+
+Доп возможность ставить голос конкретного билета сразу в нескольких голосованиях.
+
