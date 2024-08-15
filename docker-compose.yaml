@@ -1,84 +1,88 @@
 services:
-  frontend:
-    build:
-      context: ./frontts
-      dockerfile: Dockerfile.prod
-    container_name: fp-frontend
-    command: serve -s build
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
-    volumes:
-      - ./frontts/src:/usr/src/app/src
-    ports:
-      - 3000:3000
-    networks:
-      - fp-network
+   frontend:
+      build:
+         context: ./frontts
+         dockerfile: Dockerfile.prod
+      container_name: fp-frontend
+      command: serve -s build
+      restart: unless-stopped
+      stdin_open: true
+      tty: true
+      depends_on:
+         - api
+         # - auth
+      volumes:
+         - ./frontts/src:/usr/src/app/src
+      ports:
+         - 3000:3000
+      networks:
+         - fp-network
 
-  api:
-    build: ./api
-    container_name: fp-api
-    command: npm run start
-    restart: unless-stopped
-    environment:
-      - PORT=3001
-      # - HOST=http://localhost
-      - MONGO_URL=mongodb://api_db:27017/api
-      - AUTH_API_URL=http://auth:3002/api
-    depends_on:
-      - api_db
-    networks:
-      - fp-network
+   api:
+      build: ./api
+      container_name: fp-api
+      command: npm run start
+      restart: unless-stopped
+      environment:
+         - PORT=3001
+         # - HOST=http://localhost
+         - MONGO_URL=mongodb://api_db:27017/api
+         # - AUTH_API_URL=http://auth:3002/api
+      depends_on:
+         - api_db
+      networks:
+         - fp-network
 
-  auth:
-    build: ./auth
-    container_name: fp-auth
-    command: npm run start
-    restart: unless-stopped
-    environment:
-      - PORT=3002
-      # - HOST=http://localhost
-      - MONGO_URL=mongodb://auth_db:27017/auth
-      - API_URL=http://api:3001/api
-    depends_on:
-      - auth_db
-    networks:
-      - fp-network
+   # auth:
+   #    build: ./auth
+   #    container_name: fp-auth
+   #    command: npm run start
+   #    restart: unless-stopped
+   #    environment:
+   #       - PORT=3002
+   #       # - HOST=http://localhost
+   #       - MONGO_URL=mongodb://auth_db:27017/auth
+   #       - API_URL=http://api:3001/api
+   #    depends_on:
+   #       - auth_db
+   #    networks:
+   #       - fp-network
 
-  api_db:
-    image: mongo:latest
-    container_name: fp-api-db
-    volumes:
-      - mongodb_api:/data/db
-    networks:
-      - fp-network
+   api_db:
+      image: mongo:latest
+      container_name: fp-api-db
+      command: mongod --quiet --logpath /dev/null 
+      volumes:
+         - mongodb_api:/data/db
+      networks:
+         - fp-network
 
-  auth_db:
-    image: mongo:latest
-    container_name: fp-auth-db
-    volumes:
-      - mongodb_auth:/data/db
-    networks:
-      - fp-network
+   # auth_db:
+      # image: mongo:latest
+      # container_name: fp-auth-db
+      # volumes:
+      #    - mongodb_auth:/data/db
+      # networks:
+      #    - fp-network
 
-  nginx:
-    image: nginx:stable-alpine
-    container_name: fp-nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/nginx.conf
-    depends_on:
-      - frontend
-      - api
-      - auth
-    networks:
-      - fp-network
+   nginx:
+      image: nginx:stable-alpine
+      container_name: fp-nginx
+      ports:
+         - "80:80"
+      volumes:
+         - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/nginx.conf
+      depends_on:
+         - frontend
+         - api
+         # - auth
+      networks:
+         - fp-network
 
 networks:
-  fp-network:
-    driver: bridge
+   fp-network:
+      driver: bridge
 
 volumes:
-  mongodb_api:
-  mongodb_auth:
+   mongodb_api:
+   # mongodb_auth:

@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const axios = require("axios");
 const { connectDB } = require("./helpers/db");
 const { port, host, db, authApiUrl } = require("./config");
 const app = express();
@@ -8,8 +7,18 @@ const votesShchema = new mongoose.Schema({
 	title: { type: String },
 	date: { type: Date, default: new Date() },
 	status: { type: String },
-	candidates: [{ candidateName: { type: String } }],
-	tickets: [{ ticket: { type: String }, vote: { type: String } }],
+	candidates: [
+		{
+			candidateID: { type: String },
+			candidateName: { type: String },
+		},
+	],
+	tickets: [
+		{
+			ticket: { type: String },
+			vote: { type: String },
+		},
+	],
 });
 const Vote = mongoose.model("Vote", votesShchema);
 
@@ -57,6 +66,30 @@ app.post("/postData", async (req, res) => {
 	try {
 		const x = new Vote(req.body);
 		console.log(JSON.stringify({ x }));
+		let result = await x.save();
+		res.send(result);
+	} catch (error) {
+		res.status(500).send({
+			message: "Error saving vote to database",
+			error: error,
+		});
+	}
+});
+
+// // The result of `findOneAndUpdate()` is the document _before_ `update` was applied
+
+app.delete("/deleteData", async (req, res) => {
+	const { id } = req.body;
+	const filter = { _id: id };
+	const del = { age: 59 };
+	const doc = await Vote.findOneAndDelete(filter, del);
+	res.status(200).json(doc);
+});
+
+app.put("/putData", async (req, res) => {
+	try {
+		const x = new Vote(req.body);
+		console.log(JSON.stringify({ x }));
 		await x.save();
 		res.send({ message: "ok" });
 	} catch (error) {
@@ -66,7 +99,6 @@ app.post("/postData", async (req, res) => {
 		});
 	}
 });
-
 // app.get("/testCurrentUser", (req, res) => {
 // 	axios.get(authApiUrl + "/currentUser").then((response) => {
 // 		res.json({

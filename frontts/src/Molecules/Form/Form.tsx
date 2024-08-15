@@ -1,35 +1,27 @@
 import classes from "./Form.module.scss";
-import axios from "axios";
 
-function Form(prop: any) {
-   const handleSubmit = async (event: any) => {
-		event.preventDefault();
-      try {
-         const form = event.target.form;
-         const data = new FormData(form);
-         const title = data.get("title");
-         const date = data.get("date");
-         const status = data.get("status");
-         console.log(title, date, status);
-         const response = await axios.post('http://acryt.local/api/postData', {
-            title: title,
-            date: date,
-            status: status
-         });
-         console.log(response);
-         event.target.form.reset();
-      } catch (error) {
-         console.error(error);
-      }
+import { FormPropsType, StatusType, VoteType } from "../../Utilites/Types";
+
+export function Form(props: FormPropsType) {
+
+	function submitHandler(e: any) {
+		e.preventDefault();
+		console.log(e);
+		
+		const formData = new FormData(e.target);
+		const date = new Date(formData.get('date') as string);
+		console.log(formData);
+		
+		props.submit({
+			title: formData.get("title") as string,
+			status: formData.get("status") as StatusType,
+			date,
+		});
 	}
+
 	return (
-		<form className={classes.Form}>
-			<p>Form</p>
-			<input type="text" name="title" placeholder="title" />
-			<input type="date" name="date" placeholder="date" />
-			<input type="text" name="status" placeholder="status" />
-			<input type="submit" value="Submit" onClick={handleSubmit} />
-			{prop.children}
+		<form className={classes.Form} onSubmit={submitHandler}>
+			{props.children}
 		</form>
 	);
 }

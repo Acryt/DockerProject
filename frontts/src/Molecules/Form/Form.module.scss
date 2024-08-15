@@ -1,8 +1,11 @@
+@import '../../Utilites/variables';
 .Form {
 	display: flex;
-	flex: 1 1 auto;
-	flex-direction: column;
-	padding: 1rem;
-	max-width: 400px;
-	gap: 20px;
+	flex-wrap: wrap;
+	gap: 12px;
+	
+	padding: 12px;
+	border-radius: 4px;
+	background: $c-secondary;
+	box-shadow: $shadow;
 }

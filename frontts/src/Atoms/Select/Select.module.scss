@@ -1,0 +1,14 @@
+@import '../../Utilites/variables';
+.Select {
+	background: $c-normal;
+	border-radius: 4px;
+	border: 1px solid $c-tertiary;
+	padding: 4px;
+
+	&:hover {
+		background-color: $c-hover;
+	}
+	&:active {
+		background-color: $c-active;
+	}
+}

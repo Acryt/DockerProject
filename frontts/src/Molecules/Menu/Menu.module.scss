@@ -1,5 +1,18 @@
+@import '../../Utilites/variables';
+
 .Menu {
-	background-color: #353545;
-	color: #ffffff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: $c-secondary;
+	color: $c-normal;
+	box-shadow: $shadow;
 	flex: 1 1 100px;
+	gap: 8px;
+	z-index: 3;
+	padding: $header+$padding $padding $footer+$padding $padding;
+
+	input, button {
+		width: 140px;
+	}
 }

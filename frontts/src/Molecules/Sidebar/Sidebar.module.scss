@@ -1,7 +1,11 @@
+@import '../../Utilites/variables';
 .Sidebar {
-	background-color: #353545;
-	color: #ffffff;
+	background: $c-secondary;
+	color: $c-normal;
 	flex: 1 1 100px;
+	z-index: 3;
+	box-shadow: $shadow;
+	padding: $header+$padding $padding $footer+$padding $padding;
 
 	&__data {
 		display: flex;

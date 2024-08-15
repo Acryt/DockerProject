@@ -1,0 +1,17 @@
+.Sidebar {
+	background-color: #353545;
+	color: #ffffff;
+	flex: 1 1 100px;
+
+	&__data {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 20px;
+	}
+	&__card {
+		border: 1px solid #ffffff;
+		border-radius: 12px;
+	}
+}
