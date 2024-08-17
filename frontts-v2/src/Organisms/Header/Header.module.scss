@@ -1,0 +1,15 @@
+@import '../../Utilites/variables';
+
+.Header {
+	position: fixed;
+	width: 100%;
+	padding: 12px;
+	box-shadow: $shadow;
+	z-index: 5;
+	color: $c-normal;
+
+		/* From https://css.glass */
+		background: $glass;
+		-webkit-backdrop-filter: blur(4px);
+		backdrop-filter: blur(4px);
+}
