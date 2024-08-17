@@ -3,6 +3,7 @@ import { FormEventHandler, MouseEventHandler } from "react";
 export type CandidateType = {
 	_id?: string;
 	candidateName?: string;
+	voteId?: string;
 };
 
 export type TicketType = {

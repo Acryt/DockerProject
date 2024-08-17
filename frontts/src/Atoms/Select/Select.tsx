@@ -6,7 +6,7 @@ import { useState } from "react";
 
 type SelectPropsType = {
 	name: string;
-	click?: any;
+	change?: any;
 	children?: any;
 };
 export function Select(props: SelectPropsType) {
@@ -15,8 +15,8 @@ export function Select(props: SelectPropsType) {
 	function selectHandler(e: any) {
 		console.log("select change");
 		setSelectValue(e.target.value);
-		if (props.click) {
-			props.click(e);
+		if (props.change) {
+			props.change(e);
 		}
 	}
 

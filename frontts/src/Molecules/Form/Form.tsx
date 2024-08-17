@@ -1,22 +1,26 @@
 import classes from "./Form.module.scss";
 
 import { FormPropsType, StatusType, VoteType } from "../../Utilites/Types";
+import { v4 } from "uuid";
 
 export function Form(props: FormPropsType) {
-
 	function submitHandler(e: any) {
 		e.preventDefault();
 		console.log(e);
-		
+
 		const formData = new FormData(e.target);
-		const date = new Date(formData.get('date') as string);
-		console.log(formData);
-		
-		props.submit({
-			title: formData.get("title") as string,
-			status: formData.get("status") as StatusType,
-			date,
-		});
+		const data: any = {};
+
+		for (const [key, value] of Array.from(formData.entries())) {
+			if (key === "date") {
+				data[key] = new Date(value as string);
+			} else {
+				data[key] = value;
+			}
+		}
+
+		console.log(data);
+		props.submit(data);
 	}
 
 	return (
