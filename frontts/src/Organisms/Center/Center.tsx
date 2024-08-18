@@ -1,6 +1,6 @@
 import classes from "./Center.module.scss";
 // import Form from "../../Molecules/Form/Form";
-import { StatusType, CenterPropsType } from "../../Utilites/Types";
+import { CenterPropsType } from "../../Utilites/Types";
 import React, { useState } from "react";
 
 function Center(props: CenterPropsType) {

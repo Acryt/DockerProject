@@ -2,7 +2,7 @@
 .Sidebar {
 	background: $c-secondary;
 	color: $c-normal;
-	flex: 1 1 100px;
+	flex: 0 0 200px;
 	z-index: 3;
 	box-shadow: $shadow;
 	padding: $header+$padding $padding $footer+$padding $padding;

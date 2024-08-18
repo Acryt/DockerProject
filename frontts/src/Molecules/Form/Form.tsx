@@ -1,6 +1,6 @@
 import classes from "./Form.module.scss";
 
-import { FormPropsType, StatusType, VoteType } from "../../Utilites/Types";
+import { FormPropsType, StatusType } from "../../Utilites/Types";
 import { v4 } from "uuid";
 
 export function Form(props: FormPropsType) {

@@ -1,6 +1,12 @@
 import classes from "./Menu.module.scss";
+import { ViewType } from "../../Utilites/Types";
 
-function Menu(prop: any) {
+type MenuPropsType = {
+	view: ViewType;
+	children?: React.ReactNode;
+}
+
+function Menu(prop: MenuPropsType) {
 	return (
 		<nav className={classes.Menu}>
 			<p>Menu</p>

@@ -17,7 +17,7 @@ export function Select(props: SelectPropsType) {
 		setSelectValue(e.target.value);
 		if (props.change) {
 			props.change(e);
-		}
+		} 
 	}
 
 	return (

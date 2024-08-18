@@ -1,5 +1,4 @@
 import classes from "./Main.module.scss";
-
 import { MainPropsType } from "../../Utilites/Types";
 
 function Main(props: MainPropsType) {

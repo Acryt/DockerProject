@@ -1,12 +1,12 @@
-@import '../../Utilites/variables';
+@import "../../Utilites/variables";
 .Center {
 	display: flex;
 	flex-direction: column;
-	flex: 3 1 auto;
+	flex: 1 1 50%;
 	gap: 12px;
 	justify-content: start;
 	align-items: center;
 	background: $c-primary;
 	color: $c-normal;
-	padding: $header+$padding $padding $footer+$padding $padding;
+	padding: $header + $padding $padding $footer + $padding $padding;
 }

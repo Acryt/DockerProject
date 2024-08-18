@@ -1,8 +1,11 @@
 import classes from "./VoteCard.module.scss";
 
-import { VoteCardPropsType } from "../../Utilites/Types";
+import { VoteType } from "../../Utilites/Types";
 
-
+type VoteCardPropsType = {
+	children?: React.ReactNode;
+	vote: VoteType;
+}
 
 export function VoteCard(props: VoteCardPropsType) {
 
