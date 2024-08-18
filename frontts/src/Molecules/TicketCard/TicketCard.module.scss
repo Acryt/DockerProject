@@ -1,0 +1,9 @@
+@import '../../Utilites/variables';
+.TicketCard {
+	display: flex;
+	flex-direction: column;
+	background: $c-tertiary;
+	padding: 12px;
+	border-radius: 4px;
+	gap: 12px;
+}

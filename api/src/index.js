@@ -9,7 +9,7 @@ const candidateSchema = new mongoose.Schema({
 });
 const ticketSchema = new mongoose.Schema({
 	ticket: { type: String },
-	vote: { type: String },
+	candidateId: { type: String },
 });
 const votesShchema = new mongoose.Schema({
 	title: { type: String },
@@ -84,7 +84,27 @@ app.delete("/deleteCandidate", async (req, res) => {
 	console.log(result);
 	res.status(200).json(result);
  });
-
+ app.post("/addTicket", async (req, res) => {
+	try {
+		const vote = await Vote.findById(req.body.voteId);
+		if (vote.tickets.find((t) => t.ticket === req.body.ticket)) {
+			return res.status(400).send({
+				vote: vote,
+				message: "Ticket already exists",
+			});
+		} else {
+			const t = new Ticket({ ticket: req.body.ticket, candidateId: req.body.candidateId });
+			vote.tickets.push(t);
+			const result = await vote.save();
+			res.send(vote);
+		}
+	} catch (error) {
+		res.status(500).send({
+			message: "Error saving vote to database",
+			error: error,
+		});
+	}
+});
 // // The result of `findOneAndUpdate()` is the document _before_ `update` was applied
 
 // app.put("/putVote", async (req, res) => {

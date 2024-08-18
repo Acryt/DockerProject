@@ -6,7 +6,7 @@ import { v4 } from "uuid";
 export function Form(props: FormPropsType) {
 	function submitHandler(e: any) {
 		e.preventDefault();
-		console.log(e);
+		// console.log(e);
 
 		const formData = new FormData(e.target);
 		const data: any = {};
@@ -19,7 +19,7 @@ export function Form(props: FormPropsType) {
 			}
 		}
 
-		console.log(data);
+		// console.log(data);
 		props.submit(data);
 	}
 

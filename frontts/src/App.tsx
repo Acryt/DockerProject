@@ -33,6 +33,7 @@ import {
 	TicketType,
 } from "./Utilites/Types";
 import CandidateCard from "./Molecules/CandidateCard/CandidateCard";
+import TicketCard from "./Molecules/TicketCard/TicketCard";
 
 function App() {
 	const [state, setState] = useState<StateType>([]);
@@ -68,7 +69,9 @@ function App() {
 	const [view, setView] = useState<ViewType>("votes");
 	const [voteFilter, setVoteFilter] = useState<FilterStateType>("all");
 	let filteredState: StateType = state;
-	const [activeVote, setActiveVote] = useState<VoteType | undefined>(undefined);
+	const [activeVote, setActiveVote] = useState<VoteType | undefined>(
+		undefined
+	);
 	useEffect(() => {
 		if (state.length > 0) {
 			setActiveVote(state[0]);
@@ -88,28 +91,25 @@ function App() {
 	const [activeCandidate, setActiveCandidate] = useState<ActiveCandidate>("");
 	async function addCandidate(candidate: CandidateType) {
 		console.log("addCandidate");
-		try {
-			const res = await axios.post("/api/addCandidate", candidate);
-			const s = state.filter((vote) => vote._id !== candidate.voteId);
-			setState([res.data! as VoteType, ...s]);
-		 } catch (err) {
-			console.log(err);
-		 }
+		axios
+			.post("/api/addCandidate", candidate)
+			.then((res) => {
+				const s = state.filter((vote) => vote._id !== candidate.voteId);
+				s.push(res.data! as VoteType);
+				setState(s);
+			})
+			.catch((err) => console.log(err));
 	}
 	function deleteCandidate(voteId: string, id: string) {
 		console.log("deleteCandidate");
-		function delC(x: any) {
-			console.log("delC");
-			console.log(x);
-			let newC = x.candidates
-			let s = state.filter((vote) => vote._id !== x._id);
-			s.push(x);
-			return s;
-		}
 		axios
 			.delete("/api/deleteCandidate", { data: { voteId: voteId, id: id } })
-			.then((res) => setState(delC(res.data)))
-			.then(() => console.log("rem done id=" + id));
+			.then((res) => {
+				const s = state.filter((vote) => vote._id !== res.data._id);
+				s.push(res.data! as VoteType);
+				setState(s);
+			})
+			.catch((err) => console.log(err));
 	}
 
 	function changeActiveCandidate(id: ActiveCandidate) {
@@ -126,9 +126,20 @@ function App() {
 		filteredState = state.filter((vote) => vote.status === status);
 	}
 
-	function addTicket(ticket: TicketType) {
+	async function addTicket(ticket: TicketType) {
 		console.log("addTicket");
-		console.log(ticket);
+		axios
+			.post("/api/addTicket", ticket)
+			.then((res) => {
+				const s = state.filter((vote) => vote._id !== ticket.voteId);
+				s.push(res.data! as VoteType);
+				setState(s);
+			})
+			.catch((err) => console.log(err));
+	}
+
+	function deleteTicket(voteId: string, id: string) {
+		console.log("deleteTicket");
 	}
 	// let x = state.filter((vote) => vote._id === activeVote)[0].candidates?.map;
 
@@ -206,15 +217,19 @@ function App() {
 							<Button>Add</Button>
 						</Form>
 						<CandidatesContainer>
-							{activeVote && activeVote.candidates ? activeVote.candidates.map((с) => (
-								<CandidateCard key={v4()} candidate={с}>
-									<Button
-										click={() =>deleteCandidate(activeVote._id!, с._id!)}
-									>
-										Delete
-									</Button>
-								</CandidateCard>
-							)) : null}
+							{activeVote && activeVote.candidates
+								? activeVote.candidates.map((с) => (
+										<CandidateCard key={v4()} candidate={с}>
+											<Button
+												click={() =>
+													deleteCandidate(activeVote._id!, с._id!)
+												}
+											>
+												Delete
+											</Button>
+										</CandidateCard>
+								  ))
+								: null}
 						</CandidatesContainer>
 					</Center>
 				)}
@@ -230,14 +245,16 @@ function App() {
 									/>
 								))}
 							</Select>
-							<Select name="candidateId" change={changeActiveVote}>
-								{activeVote && activeVote.candidates ? activeVote.candidates.map((c) => (
-									<Option
-										key={v4()}
-										title={c.name}
-										value={c._id}
-									/>
-								)) : null}
+							<Select name="candidateId" change={changeActiveCandidate}>
+								{activeVote && activeVote.candidates
+									? activeVote.candidates.map((c) => (
+											<Option
+												key={v4()}
+												title={c.name}
+												value={c._id}
+											/>
+									  ))
+									: null}
 							</Select>
 							<Input
 								typeInput="text"
@@ -247,7 +264,21 @@ function App() {
 							/>
 							<Button>Add</Button>
 						</Form>
-						<TicketsContainer>1</TicketsContainer>
+						<TicketsContainer>
+							{activeVote && activeVote.tickets
+								? activeVote.tickets.map((t) => (
+										<TicketCard key={v4()} ticket={t}>
+											<Button
+												click={() =>
+													deleteTicket(activeVote._id!, t._id!)
+												}
+											>
+												Delete
+											</Button>
+										</TicketCard>
+								  ))
+								: null}
+						</TicketsContainer>
 					</Center>
 				)}
 				<Sidebar />
