@@ -105,6 +105,14 @@ app.delete("/deleteCandidate", async (req, res) => {
 		});
 	}
 });
+app.delete("/deleteTicket", async (req, res) => {
+	const { voteId, id } = req.body;
+	let vote = await Vote.findById(voteId);
+	vote.tickets = vote.tickets.filter((t) => t._id != id);
+	const result = await vote.save();
+	console.log(result);
+	res.status(200).json(result);
+ });
 // // The result of `findOneAndUpdate()` is the document _before_ `update` was applied
 
 // app.put("/putVote", async (req, res) => {

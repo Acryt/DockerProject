@@ -17,7 +17,7 @@ export type InputPropsType = {
 	typeInput?: string;
 	value?: string;
 	placeholder?: string;
-	change?: any;
+	change?: any
 	children?: any;
 };
 export type MainPropsType = {

@@ -52,7 +52,7 @@ function App() {
 		axios
 			.post("/api/addVote", vote)
 			.then((res) => (vote = { ...vote, _id: res.data._id }))
-			.then(() => setState([vote, ...state]))
+			.then(() => setState([...state, vote]))
 			.then(() => console.log("add done id=" + vote._id))
 			.catch((err) => console.log(err));
 	}
@@ -70,13 +70,8 @@ function App() {
 	const [voteFilter, setVoteFilter] = useState<FilterStateType>("all");
 	let filteredState: StateType = state;
 	const [activeVote, setActiveVote] = useState<VoteType | undefined>(
-		undefined
+		state[0] ? state[state.length - 1] : undefined
 	);
-	useEffect(() => {
-		if (state.length > 0) {
-			setActiveVote(state[0]);
-		}
-	}, [state]);
 
 	function changeActiveVote(e: any) {
 		console.log(e.target.value);
@@ -112,8 +107,9 @@ function App() {
 			.catch((err) => console.log(err));
 	}
 
-	function changeActiveCandidate(id: ActiveCandidate) {
-		setActiveCandidate(id);
+	function changeActiveCandidate(e: any) {
+		console.log(e.target.value);
+		setActiveCandidate(e.target.value);
 	}
 	function changeView(view: ViewType) {
 		setView(view);
@@ -131,17 +127,37 @@ function App() {
 		axios
 			.post("/api/addTicket", ticket)
 			.then((res) => {
-				const s = state.filter((vote) => vote._id !== ticket.voteId);
+				console.log(res.data);
+				return res;
+			})
+			.then((res) => {
+				const s = state.filter((vote) => vote._id !== res.data._id);
 				s.push(res.data! as VoteType);
+				console.log(s);
 				setState(s);
 			})
 			.catch((err) => console.log(err));
 	}
 
-	function deleteTicket(voteId: string, id: string) {
-		console.log("deleteTicket");
+	function deleteTicket(voteId: string, id: any) {
+		console.log(voteId);
+		console.log(id);
+		axios
+			.delete("/api/deleteTicket", { data: { voteId: voteId, id: id } })
+			.then((res) => {
+				const s = state.filter((vote) => vote._id !== res.data._id);
+				s.push(res.data! as VoteType);
+				setState(s);
+			})
+			.catch((err) => console.log(err));
 	}
 	// let x = state.filter((vote) => vote._id === activeVote)[0].candidates?.map;
+	useEffect(() => {
+		console.log("useEffect без axios");
+		setState(state);
+		const newVote = state.find((vote) => vote._id === activeVote?._id);
+		setActiveVote(newVote);
+	}, [state]);
 
 	return (
 		<div className={classes.App}>
@@ -270,7 +286,7 @@ function App() {
 										<TicketCard key={v4()} ticket={t}>
 											<Button
 												click={() =>
-													deleteTicket(activeVote._id!, t._id!)
+													deleteTicket(activeVote._id!, t._id)
 												}
 											>
 												Delete
