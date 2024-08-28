@@ -2,7 +2,7 @@ services:
   frontend:
     build:
       context: ./frontts
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
     command: npm run start
 
   api:

@@ -2,6 +2,7 @@ import classes from "./App.module.scss";
 
 // React
 import React, { useEffect, useState } from "react";
+import { Routes, Route, Link } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { v4 } from "uuid";
 
@@ -70,13 +71,15 @@ function App() {
 	const [view, setView] = useState<ViewType>("categories");
 	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
 	let filteredState: StateType = state;
-	const [activeCategory, setActiveCategory] = useState<CategoryType | undefined>(
-		state[0] ? state[state.length - 1] : undefined
-	);
+	const [activeCategory, setActiveCategory] = useState<
+		CategoryType | undefined
+	>(state[0] ? state[state.length - 1] : undefined);
 
 	function changeActiveCategory(e: any) {
 		console.log("changeActiveCategory");
-		const activeCategory = state.find((category) => category._id === e.target.value);
+		const activeCategory = state.find(
+			(category) => category._id === e.target.value
+		);
 		if (activeCategory) {
 			setActiveCategory(activeCategory);
 		} else {
@@ -90,7 +93,9 @@ function App() {
 		axios
 			.post("/api/addCandidate", candidate)
 			.then((res) => {
-				const s = state.filter((category) => category._id !== candidate.categoryId);
+				const s = state.filter(
+					(category) => category._id !== candidate.categoryId
+				);
 				s.push(res.data! as CategoryType);
 				setState(s);
 			})
@@ -99,7 +104,9 @@ function App() {
 	function deleteCandidate(categoryId: string, id: string) {
 		console.log("deleteCandidate");
 		axios
-			.delete("/api/deleteCandidate", { data: { categoryId: categoryId, id: id } })
+			.delete("/api/deleteCandidate", {
+				data: { categoryId: categoryId, id: id },
+			})
 			.then((res) => {
 				const s = state.filter((category) => category._id !== res.data._id);
 				s.push(res.data! as CategoryType);
@@ -116,7 +123,9 @@ function App() {
 		setView(view);
 	}
 	if (categoryFilter !== "all") {
-		filteredState = state.filter((category) => category.status === categoryFilter);
+		filteredState = state.filter(
+			(category) => category.status === categoryFilter
+		);
 	}
 	function filterCategories(status: FilterStateType) {
 		setCategoryFilter(status);
@@ -144,7 +153,9 @@ function App() {
 		console.log(categoryId);
 		console.log(id);
 		axios
-			.delete("/api/deleteTicket", { data: { categoryId: categoryId, id: id } })
+			.delete("/api/deleteTicket", {
+				data: { categoryId: categoryId, id: id },
+			})
 			.then((res) => {
 				const s = state.filter((category) => category._id !== res.data._id);
 				s.push(res.data! as CategoryType);
@@ -155,7 +166,9 @@ function App() {
 	useEffect(() => {
 		console.log("useEffect без axios");
 		setState(state);
-		const newCategory = state.find((category) => category._id === activeCategory?._id);
+		const newCategory = state.find(
+			(category) => category._id === activeCategory?._id
+		);
 		setActiveCategory(newCategory);
 	}, [state]);
 
@@ -165,14 +178,24 @@ function App() {
 			<Main>
 				<Menu view={view}>
 					<hr />
-					<Button title="Categories" click={() => changeView("categories")} />
+					<Button
+						title="Categories"
+						click={() => changeView("categories")}
+					/>
 					<Button
 						title="Candidates"
 						click={() => changeView("candidates")}
 					/>
 					<Button title="Tickets" click={() => changeView("tickets")} />
 					<hr />
-					<Button title="All Categories" click={() => filterCategories("all")} />
+					<Link className={classes.Link} to="/categories">Categories</Link>
+					<Link className={classes.Link} to="/candidates">Candidates</Link>
+					<Link className={classes.Link} to="/tickets">Tickets</Link>
+					<hr />
+					<Button
+						title="All Categories"
+						click={() => filterCategories("all")}
+					/>
 					<Button
 						title="Active Categories"
 						click={() => filterCategories("active")}
@@ -196,14 +219,16 @@ function App() {
 								<Option title="active" value="active" />
 								<Option title="inactive" value="inactive" />
 							</Select>
-							<Input typeInput="date" name="date" value="" />
+							<Input typeInput="date" name="date" value="" required />
 							<Button>Add</Button>
 						</Form>
 						<CategoriesContainer>
 							{filteredState.map((category) => (
 								<CategoryCard key={v4()} category={category}>
 									<Button
-										click={() => removeCategory(category._id! as string)}
+										click={() =>
+											removeCategory(category._id! as string)
+										}
 									>
 										Delete
 									</Button>
@@ -229,6 +254,7 @@ function App() {
 								name="name"
 								placeholder="candidate"
 								value=""
+								required
 							/>
 							<Button>Add</Button>
 						</Form>
@@ -238,7 +264,10 @@ function App() {
 										<CandidateCard key={v4()} candidate={с}>
 											<Button
 												click={() =>
-													deleteCandidate(activeCategory._id!, с._id!)
+													deleteCandidate(
+														activeCategory._id!,
+														с._id!
+													)
 												}
 											>
 												Delete
@@ -277,6 +306,7 @@ function App() {
 								name="ticket"
 								placeholder="ticket"
 								value=""
+								required
 							/>
 							<Button>Add</Button>
 						</Form>

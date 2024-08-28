@@ -11,7 +11,7 @@ export function Input(props: InputPropsType) {
 	}
 
 	return (
-		<input className={classes.Input} onChange={changeHandler} value={stateValue} name={props.name} type={props.typeInput} placeholder={props.placeholder}/>
+		<input className={classes.Input} onChange={changeHandler} value={stateValue} name={props.name} type={props.typeInput} placeholder={props.placeholder} required={props.required}/>
 	);
 }
 

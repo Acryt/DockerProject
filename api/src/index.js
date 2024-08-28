@@ -18,6 +18,10 @@ const categoryShchema = new mongoose.Schema({
 	candidates: [candidateSchema],
 	tickets: [ticketSchema],
 });
+const pullTicketsSchema = new mongoose.Schema({
+	categoryId: { type: String },
+	ticket: { type: String },
+});
 
 const Category = mongoose.model("Category", categoryShchema);
 const Candidate = mongoose.model("Candidate", candidateSchema);
@@ -83,8 +87,9 @@ app.delete("/deleteCandidate", async (req, res) => {
 	const result = await category.save();
 	console.log(result);
 	res.status(200).json(result);
- });
- app.post("/addTicket", async (req, res) => {
+});
+
+app.post("/addTicket", async (req, res) => {
 	try {
 		const category = await Category.findById(req.body.categoryId);
 		if (category.tickets.find((t) => t.ticket === req.body.ticket)) {
@@ -93,7 +98,10 @@ app.delete("/deleteCandidate", async (req, res) => {
 				message: "Ticket already exists",
 			});
 		} else {
-			const t = new Ticket({ ticket: req.body.ticket, candidateId: req.body.candidateId });
+			const t = new Ticket({
+				ticket: req.body.ticket,
+				candidateId: req.body.candidateId,
+			});
 			category.tickets.push(t);
 			const result = await category.save();
 			res.send(category);
@@ -112,31 +120,7 @@ app.delete("/deleteTicket", async (req, res) => {
 	const result = await category.save();
 	console.log(result);
 	res.status(200).json(result);
- });
-// // The result of `findOneAndUpdate()` is the document _before_ `update` was applied
-
-// app.put("/putCategory", async (req, res) => {
-// 	try {
-// 		const x = new Category(req.body);
-// 		console.log(JSON.stringify({ x }));
-// 		await x.save();
-// 		res.send({ message: "ok" });
-// 	} catch (error) {
-// 		res.status(500).send({
-// 			message: "Error saving category to database",
-// 			error: error,
-// 		});
-// 	}
-// });
-
-// app.get("/testCurrentUser", (req, res) => {
-// 	axios.get(authApiUrl + "/currentUser").then((response) => {
-// 		res.json({
-// 			testCurrentUser: true,
-// 			user: response.data,
-// 		});
-// 	});
-// });
+});
 
 connectDB()
 	.on("error", console.log)

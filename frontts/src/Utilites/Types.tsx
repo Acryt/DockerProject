@@ -18,6 +18,7 @@ export type InputPropsType = {
 	value?: string;
 	placeholder?: string;
 	change?: any
+	required?: boolean;
 	children?: any;
 };
 export type MainPropsType = {
