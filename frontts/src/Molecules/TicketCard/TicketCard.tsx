@@ -13,7 +13,7 @@ export function TicketCard(props: TicketCardPropsType) {
 		<div className={classes.TicketCard}>
 			<p>{props.ticket.ticket}</p>
 			<p>{props.ticket.candidateId}</p>
-			<p>{props.ticket.voteId}</p>
+			<p>{props.ticket.categoryId}</p>
 			{props.children}
 		</div>
 	);

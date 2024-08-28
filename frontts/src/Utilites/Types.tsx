@@ -38,7 +38,7 @@ export type OptionPropsType = {
 	value?: string;
 }
 
-export type VoteType = {
+export type CategoryType = {
 	_id?: string;
 	title: string;
 	date: Date;
@@ -49,19 +49,19 @@ export type VoteType = {
 
 export type ActiveCandidate = string | undefined;
 
-export type StateType = Array<VoteType>;
+export type StateType = Array<CategoryType>;
 export type CandidateType = {
 	_id?: string;
-	voteId: string;
+	categoryId: string;
 	name: string;
 };
 export type TicketType = {
 	_id?: string;
 	ticket: string;
 	candidateId: string;
-	voteId: string;
+	categoryId: string;
 };
 export type StatusType = "active" | "inactive";
 export type FilterStateType = StatusType | "all";
 
-export type ViewType = 'votes' | 'candidates' | 'tickets';
+export type ViewType = 'categories' | 'candidates' | 'tickets';

@@ -11,7 +11,7 @@ const ticketSchema = new mongoose.Schema({
 	ticket: { type: String },
 	candidateId: { type: String },
 });
-const votesShchema = new mongoose.Schema({
+const categoryShchema = new mongoose.Schema({
 	title: { type: String },
 	date: { type: Date, default: new Date() },
 	status: { type: String },
@@ -19,7 +19,7 @@ const votesShchema = new mongoose.Schema({
 	tickets: [ticketSchema],
 });
 
-const Vote = mongoose.model("Vote", votesShchema);
+const Category = mongoose.model("Category", categoryShchema);
 const Candidate = mongoose.model("Candidate", candidateSchema);
 const Ticket = mongoose.model("Ticket", ticketSchema);
 
@@ -38,92 +38,92 @@ app.get("/", (req, res) => {
 });
 
 app.get("/getData", async (req, res) => {
-	let x = await Vote.find();
+	let x = await Category.find();
 	res.send(x);
 });
 
-app.post("/addVote", async (req, res) => {
+app.post("/addCategory", async (req, res) => {
 	try {
-		const x = new Vote(req.body);
+		const x = new Category(req.body);
 		console.log(JSON.stringify({ x }));
 		let result = await x.save();
 		res.send(result);
 	} catch (error) {
 		res.status(500).send({
-			message: "Error saving vote to database",
+			message: "Error saving category to database",
 			error: error,
 		});
 	}
 });
-app.delete("/deleteVote", async (req, res) => {
+app.delete("/deleteCategory", async (req, res) => {
 	const { id } = req.body;
 	const filter = { _id: id };
-	const doc = await Vote.findOneAndDelete(filter);
+	const doc = await Category.findOneAndDelete(filter);
 	res.status(200).json(doc);
 });
 
 app.post("/addCandidate", async (req, res) => {
 	try {
 		const c = new Candidate({ name: req.body.name });
-		const vote = await Vote.findById(req.body.voteId);
-		vote.candidates.push(c);
-		const result = await vote.save();
+		const category = await Category.findById(req.body.categoryId);
+		category.candidates.push(c);
+		const result = await category.save();
 		res.send(result);
 	} catch (error) {
 		res.status(500).send({
-			message: "Error saving vote to database",
+			message: "Error saving category to database",
 			error: error,
 		});
 	}
 });
 app.delete("/deleteCandidate", async (req, res) => {
-	const { voteId, id } = req.body;
-	let vote = await Vote.findById(voteId);
-	vote.candidates = vote.candidates.filter((c) => c._id != id);
-	const result = await vote.save();
+	const { categoryId, id } = req.body;
+	let category = await Category.findById(categoryId);
+	category.candidates = category.candidates.filter((c) => c._id != id);
+	const result = await category.save();
 	console.log(result);
 	res.status(200).json(result);
  });
  app.post("/addTicket", async (req, res) => {
 	try {
-		const vote = await Vote.findById(req.body.voteId);
-		if (vote.tickets.find((t) => t.ticket === req.body.ticket)) {
+		const category = await Category.findById(req.body.categoryId);
+		if (category.tickets.find((t) => t.ticket === req.body.ticket)) {
 			return res.status(400).send({
-				vote: vote,
+				category: category,
 				message: "Ticket already exists",
 			});
 		} else {
 			const t = new Ticket({ ticket: req.body.ticket, candidateId: req.body.candidateId });
-			vote.tickets.push(t);
-			const result = await vote.save();
-			res.send(vote);
+			category.tickets.push(t);
+			const result = await category.save();
+			res.send(category);
 		}
 	} catch (error) {
 		res.status(500).send({
-			message: "Error saving vote to database",
+			message: "Error saving category to database",
 			error: error,
 		});
 	}
 });
 app.delete("/deleteTicket", async (req, res) => {
-	const { voteId, id } = req.body;
-	let vote = await Vote.findById(voteId);
-	vote.tickets = vote.tickets.filter((t) => t._id != id);
-	const result = await vote.save();
+	const { categoryId, id } = req.body;
+	let category = await Category.findById(categoryId);
+	category.tickets = category.tickets.filter((t) => t._id != id);
+	const result = await category.save();
 	console.log(result);
 	res.status(200).json(result);
  });
 // // The result of `findOneAndUpdate()` is the document _before_ `update` was applied
 
-// app.put("/putVote", async (req, res) => {
+// app.put("/putCategory", async (req, res) => {
 // 	try {
-// 		const x = new Vote(req.body);
+// 		const x = new Category(req.body);
 // 		console.log(JSON.stringify({ x }));
 // 		await x.save();
 // 		res.send({ message: "ok" });
 // 	} catch (error) {
 // 		res.status(500).send({
-// 			message: "Error saving vote to database",
+// 			message: "Error saving category to database",
 // 			error: error,
 // 		});
 // 	}

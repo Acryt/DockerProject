@@ -14,9 +14,9 @@ import Form from "./Molecules/Form/Form";
 import Button from "./Atoms/Button/Button";
 import Sidebar from "./Molecules/Sidebar/Sidebar";
 import Center from "./Organisms/Center/Center";
-import VoteCard from "./Molecules/VoteCard/VoteCard";
+import CategoryCard from "./Molecules/CategoryCard/CategoryCard";
 import TicketsContainer from "./Organisms/TicketsContainer/TicketsContainer";
-import VotesContainer from "./Organisms/VotesContainer/VotesContainer";
+import CategoriesContainer from "./Organisms/CategoriesContainer/CategoriesContainer";
 import CandidatesContainer from "./Organisms/CandidatesContainer/CandidatesContainer";
 import Option from "./Atoms/Option/Option";
 import Input from "./Atoms/Input/Input";
@@ -28,7 +28,7 @@ import {
 	StateType,
 	FilterStateType,
 	ActiveCandidate,
-	VoteType,
+	CategoryType,
 	CandidateType,
 	TicketType,
 } from "./Utilites/Types";
@@ -47,37 +47,38 @@ function App() {
 		});
 		console.log("axios done");
 	}, []);
-	function addVote(vote: VoteType) {
-		console.log("addVote");
+	function addCategory(category: CategoryType) {
+		console.log("addCategory");
 		axios
-			.post("/api/addVote", vote)
-			.then((res) => (vote = { ...vote, _id: res.data._id }))
-			.then(() => setState([...state, vote]))
-			.then(() => console.log("add done id=" + vote._id))
+			.post("/api/addCategory", category)
+			.then((res) => (category = { ...category, _id: res.data._id }))
+			.then(() => setState([...state, category]))
+			.then(() => setActiveCategory(category))
+			.then(() => console.log("add done id=" + category._id))
 			.catch((err) => console.log(err));
 	}
-	function removeVote(id: string) {
-		console.log("removeVote");
-		let s = state.filter((vote) => id !== vote._id);
+	function removeCategory(id: string) {
+		console.log("removeCategory");
+		let s = state.filter((category) => id !== category._id);
 		axios
-			.delete("/api/deleteVote", { data: { id: id } })
+			.delete("/api/deleteCategory", { data: { id: id } })
 			.then(() => setState(s))
 			.then(() => console.log("rem done id=" + id));
 		setState(s);
 	}
 
-	const [view, setView] = useState<ViewType>("votes");
-	const [voteFilter, setVoteFilter] = useState<FilterStateType>("all");
+	const [view, setView] = useState<ViewType>("categories");
+	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
 	let filteredState: StateType = state;
-	const [activeVote, setActiveVote] = useState<VoteType | undefined>(
+	const [activeCategory, setActiveCategory] = useState<CategoryType | undefined>(
 		state[0] ? state[state.length - 1] : undefined
 	);
 
-	function changeActiveVote(e: any) {
-		console.log(e.target.value);
-		const activeVote = state.find((vote) => vote._id === e.target.value);
-		if (activeVote) {
-			setActiveVote(activeVote);
+	function changeActiveCategory(e: any) {
+		console.log("changeActiveCategory");
+		const activeCategory = state.find((category) => category._id === e.target.value);
+		if (activeCategory) {
+			setActiveCategory(activeCategory);
 		} else {
 			console.log("Голосование не найдено");
 		}
@@ -89,19 +90,19 @@ function App() {
 		axios
 			.post("/api/addCandidate", candidate)
 			.then((res) => {
-				const s = state.filter((vote) => vote._id !== candidate.voteId);
-				s.push(res.data! as VoteType);
+				const s = state.filter((category) => category._id !== candidate.categoryId);
+				s.push(res.data! as CategoryType);
 				setState(s);
 			})
 			.catch((err) => console.log(err));
 	}
-	function deleteCandidate(voteId: string, id: string) {
+	function deleteCandidate(categoryId: string, id: string) {
 		console.log("deleteCandidate");
 		axios
-			.delete("/api/deleteCandidate", { data: { voteId: voteId, id: id } })
+			.delete("/api/deleteCandidate", { data: { categoryId: categoryId, id: id } })
 			.then((res) => {
-				const s = state.filter((vote) => vote._id !== res.data._id);
-				s.push(res.data! as VoteType);
+				const s = state.filter((category) => category._id !== res.data._id);
+				s.push(res.data! as CategoryType);
 				setState(s);
 			})
 			.catch((err) => console.log(err));
@@ -114,12 +115,12 @@ function App() {
 	function changeView(view: ViewType) {
 		setView(view);
 	}
-	if (voteFilter !== "all") {
-		filteredState = state.filter((vote) => vote.status === voteFilter);
+	if (categoryFilter !== "all") {
+		filteredState = state.filter((category) => category.status === categoryFilter);
 	}
-	function filterVotes(status: FilterStateType) {
-		setVoteFilter(status);
-		filteredState = state.filter((vote) => vote.status === status);
+	function filterCategories(status: FilterStateType) {
+		setCategoryFilter(status);
+		filteredState = state.filter((category) => category.status === status);
 	}
 
 	async function addTicket(ticket: TicketType) {
@@ -131,32 +132,31 @@ function App() {
 				return res;
 			})
 			.then((res) => {
-				const s = state.filter((vote) => vote._id !== res.data._id);
-				s.push(res.data! as VoteType);
+				const s = state.filter((category) => category._id !== res.data._id);
+				s.push(res.data! as CategoryType);
 				console.log(s);
 				setState(s);
 			})
 			.catch((err) => console.log(err));
 	}
 
-	function deleteTicket(voteId: string, id: any) {
-		console.log(voteId);
+	function deleteTicket(categoryId: string, id: any) {
+		console.log(categoryId);
 		console.log(id);
 		axios
-			.delete("/api/deleteTicket", { data: { voteId: voteId, id: id } })
+			.delete("/api/deleteTicket", { data: { categoryId: categoryId, id: id } })
 			.then((res) => {
-				const s = state.filter((vote) => vote._id !== res.data._id);
-				s.push(res.data! as VoteType);
+				const s = state.filter((category) => category._id !== res.data._id);
+				s.push(res.data! as CategoryType);
 				setState(s);
 			})
 			.catch((err) => console.log(err));
 	}
-	// let x = state.filter((vote) => vote._id === activeVote)[0].candidates?.map;
 	useEffect(() => {
 		console.log("useEffect без axios");
 		setState(state);
-		const newVote = state.find((vote) => vote._id === activeVote?._id);
-		setActiveVote(newVote);
+		const newCategory = state.find((category) => category._id === activeCategory?._id);
+		setActiveCategory(newCategory);
 	}, [state]);
 
 	return (
@@ -165,27 +165,27 @@ function App() {
 			<Main>
 				<Menu view={view}>
 					<hr />
-					<Button title="Votes" click={() => changeView("votes")} />
+					<Button title="Categories" click={() => changeView("categories")} />
 					<Button
 						title="Candidates"
 						click={() => changeView("candidates")}
 					/>
 					<Button title="Tickets" click={() => changeView("tickets")} />
 					<hr />
-					<Button title="All Votes" click={() => filterVotes("all")} />
+					<Button title="All Categories" click={() => filterCategories("all")} />
 					<Button
-						title="Active Votes"
-						click={() => filterVotes("active")}
+						title="Active Categories"
+						click={() => filterCategories("active")}
 					/>
 					<Button
-						title="InActive Votes"
-						click={() => filterVotes("inactive")}
+						title="InActive Categories"
+						click={() => filterCategories("inactive")}
 					/>
 				</Menu>
 
-				{view === "votes" && (
+				{view === "categories" && (
 					<Center>
-						<Form submit={addVote}>
+						<Form submit={addCategory}>
 							<Input
 								typeInput="text"
 								name="title"
@@ -199,28 +199,28 @@ function App() {
 							<Input typeInput="date" name="date" value="" />
 							<Button>Add</Button>
 						</Form>
-						<VotesContainer>
-							{filteredState.map((vote) => (
-								<VoteCard key={v4()} vote={vote}>
+						<CategoriesContainer>
+							{filteredState.map((category) => (
+								<CategoryCard key={v4()} category={category}>
 									<Button
-										click={() => removeVote(vote._id! as string)}
+										click={() => removeCategory(category._id! as string)}
 									>
 										Delete
 									</Button>
-								</VoteCard>
+								</CategoryCard>
 							))}
-						</VotesContainer>
+						</CategoriesContainer>
 					</Center>
 				)}
 				{view === "candidates" && (
 					<Center>
 						<Form submit={addCandidate}>
-							<Select name="voteId" change={changeActiveVote}>
-								{state.map((vote) => (
+							<Select name="categoryId" change={changeActiveCategory}>
+								{state.map((category) => (
 									<Option
 										key={v4()}
-										title={vote.title}
-										value={vote._id}
+										title={category.title}
+										value={category._id}
 									/>
 								))}
 							</Select>
@@ -233,12 +233,12 @@ function App() {
 							<Button>Add</Button>
 						</Form>
 						<CandidatesContainer>
-							{activeVote && activeVote.candidates
-								? activeVote.candidates.map((с) => (
+							{activeCategory && activeCategory.candidates
+								? activeCategory.candidates.map((с) => (
 										<CandidateCard key={v4()} candidate={с}>
 											<Button
 												click={() =>
-													deleteCandidate(activeVote._id!, с._id!)
+													deleteCandidate(activeCategory._id!, с._id!)
 												}
 											>
 												Delete
@@ -252,18 +252,18 @@ function App() {
 				{view === "tickets" && (
 					<Center>
 						<Form submit={addTicket}>
-							<Select name="voteId" change={changeActiveVote}>
-								{state.map((vote) => (
+							<Select name="categoryId" change={changeActiveCategory}>
+								{state.map((category) => (
 									<Option
 										key={v4()}
-										title={vote.title}
-										value={vote._id}
+										title={category.title}
+										value={category._id}
 									/>
 								))}
 							</Select>
 							<Select name="candidateId" change={changeActiveCandidate}>
-								{activeVote && activeVote.candidates
-									? activeVote.candidates.map((c) => (
+								{activeCategory && activeCategory.candidates
+									? activeCategory.candidates.map((c) => (
 											<Option
 												key={v4()}
 												title={c.name}
@@ -281,12 +281,12 @@ function App() {
 							<Button>Add</Button>
 						</Form>
 						<TicketsContainer>
-							{activeVote && activeVote.tickets
-								? activeVote.tickets.map((t) => (
+							{activeCategory && activeCategory.tickets
+								? activeCategory.tickets.map((t) => (
 										<TicketCard key={v4()} ticket={t}>
 											<Button
 												click={() =>
-													deleteTicket(activeVote._id!, t._id)
+													deleteTicket(activeCategory._id!, t._id)
 												}
 											>
 												Delete
