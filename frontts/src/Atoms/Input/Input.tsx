@@ -8,6 +8,9 @@ export function Input(props: InputPropsType) {
 	function changeHandler(e: any) {
 		console.log("input change");
 		setStateValue(e.target.value);
+		if (props.change) {
+			props.change(e);
+		}
 	}
 
 	return (

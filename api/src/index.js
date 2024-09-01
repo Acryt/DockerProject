@@ -70,11 +70,18 @@ app.delete("/deleteCategory", async (req, res) => {
 });
 
 app.post("/addPool", async (req, res) => {
+	let min = toNumber(req.body.min);
+	let max = toNumber(req.body.max);
 	try {
-		const p = new Pool({ name: req.body.name });
-		const category = await Category.findById(req.body.categoryId);
-		category.pool.push(c);
-		const result = await category.save();
+		if (req.body.min > req.body.max) {
+			return res.status(400).send({
+				category: category,
+				message: "Min > Max",
+			});
+		}
+		const x = new Pool(req.body);
+		console.log(JSON.stringify({ x }));
+		let result = await x.save();
 		res.send(result);
 	} catch (error) {
 		res.status(500).send({
@@ -84,12 +91,10 @@ app.post("/addPool", async (req, res) => {
 	}
 });
 app.delete("/deletePool", async (req, res) => {
-	const { categoryId, id } = req.body;
-	let category = await Category.findById(categoryId);
-	category.pool = category.pool.filter((p) => p._id != id);
-	const result = await category.save();
-	console.log(result);
-	res.status(200).json(result);
+	const { id } = req.body;
+	const filter = { _id: id };
+	const doc = await Pool.findOneAndDelete(filter);
+	res.status(200).json(doc);
 });
 
 app.post("/addCandidate", async (req, res) => {

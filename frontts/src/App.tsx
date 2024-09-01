@@ -52,7 +52,8 @@ function App() {
 	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
 	let filteredState: StateType = state;
 	const [modalState, setModalState] = useState<boolean | undefined>(false);
-	const [delId, setDelId] = useState<string>('');
+	const [delIdCategory, setDelIdCategory] = useState<string>('');
+	const [delIdCandidate, setDelIdCandidate] = useState<string>('');
 
 	useEffect(() => {
 		console.log("useEffect");
@@ -150,7 +151,7 @@ function App() {
 				setState(s);
 			})
 			.then(() =>
-				setLogs([...logs, "Added Pool " + pool.min + " - " + pool.max])
+				setLogs([...logs, "Added tickets from " + pool.min + " to " + pool.max])
 			)
 			.catch((err) => console.log(err));
 	}
@@ -320,7 +321,7 @@ function App() {
 											<Button
 												click={() => {
 													setModalState(true);
-													setDelId(category._id!)
+													setDelIdCategory(category._id!)
 												}}
 											>
 												Delete
@@ -329,12 +330,12 @@ function App() {
 									))}
 								</CategoriesContainer>
 								{modalState ? <dialog open>
-									<p>Are you sure you want to delete category {state.find((category) => category._id === delId)?.title}?</p>
+									<p>Are you sure you want to delete category {state.find((category) => category._id === delIdCategory)?.title}?</p>
 									<Button click={() => setModalState(false)}>Close</Button>
 									<Button
 										click={() => {
-											console.log(delId);
-											removeCategory(delId);
+											console.log(delIdCategory);
+											removeCategory(delIdCategory);
 											setModalState(false);
 										}}
 									>Ok</Button>
@@ -379,7 +380,7 @@ function App() {
 														click={() =>
 														{
 															setModalState(true);
-															setDelId(с._id!)
+															setDelIdCandidate(с._id!)
 														}}
 													>
 														Delete
@@ -389,12 +390,12 @@ function App() {
 										: null}
 								</CandidatesContainer>
 								{modalState ? <dialog open>
-									<p>Are you sure you want to delete {activeCategory?.candidates.find((c) => c._id === delId)!.name} ?</p>
+									<p>Are you sure you want to delete {activeCategory?.candidates.find((c) => c._id === delIdCandidate)!.name} ?</p>
 									<Button click={() => setModalState(false)}>Close</Button>
 									<Button
 										click={() => {
-											console.log(delId);
-											deleteCandidate(activeCategory!._id!, delId);
+											console.log(delIdCandidate);
+											deleteCandidate(activeCategory!._id!, delIdCandidate);
 											setModalState(false);
 										}}
 									>Ok</Button>

@@ -4,6 +4,7 @@ import { CategoryType, StateType } from "../../Utilites/Types";
 import Select from "../../Atoms/Select/Select";
 import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
+import Input from "../../Atoms/Input/Input";
 
 type TableContainerPropsType = {
 	children?: React.ReactNode;
@@ -12,6 +13,8 @@ type TableContainerPropsType = {
 
 export function TableContainer(props: TableContainerPropsType) {
 	const [activeCategoryId, setActiveCategoryId] = useState<string>("");
+	const [inputPass, setInputPass] = useState<string>("");
+	const pass: string = "2dResults";
 
 	useEffect(() => {
 		if (props.state.length > 0) {
@@ -37,7 +40,14 @@ export function TableContainer(props: TableContainerPropsType) {
 				))}
 			</Select>
 
-			{/* вывод таблицы суммы тикетов за каждого отдельного кандидата */}
+			<input
+				type="text"
+				name="pass"
+				placeholder="Password"
+				value={inputPass}
+				onChange={(e) => setInputPass(e.target.value)}
+			/>
+			{ inputPass === pass ?
 			<table>
 				<thead>
 					<tr>
@@ -67,7 +77,7 @@ export function TableContainer(props: TableContainerPropsType) {
 							</tr>
 						))}
 				</tbody>
-			</table>
+			</table> : "" }
 			{props.children}
 		</div>
 	);
