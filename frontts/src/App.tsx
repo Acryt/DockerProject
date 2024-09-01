@@ -137,18 +137,18 @@ function App() {
 			.catch((err) => console.log(err));
 	}
 	async function addPool(pool: PoolType) {
-		// console.log("addPool");
-		// axios
-		// .post("/api/addPool", pool)
-		// .then((res) => {
-		// 	const s = state.filter(
-		// 		(category) => category._id !== pool.categoryId
-		// 	);
-		// 	s.push(res.data! as CategoryType);
-		// 	setState(s);
-		// })
-		// .then(() => setLogs([...logs, "Added Pool " + pool.min + " - " + pool.max]))
-		// .catch((err) => console.log(err));
+		console.log("addPool");
+		axios
+		.post("/api/addPool", pool)
+		.then((res) => {
+			const s = state.filter(
+				(category) => category._id !== pool.categoryId
+			);
+			s.push(res.data! as CategoryType);
+			setState(s);
+		})
+		.then(() => setLogs([...logs, "Added Pool " + pool.min + " - " + pool.max]))
+		.catch((err) => console.log(err));
 	}
 	function deleteCandidate(categoryId: string, id: string) {
 		console.log("deleteCandidate");
