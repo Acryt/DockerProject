@@ -4,4 +4,8 @@
 	padding: 4px;
 	border: unset;
 	border-radius: 4px;
+
+	&:focus {
+		background: $c-hover;
+	}
 }
