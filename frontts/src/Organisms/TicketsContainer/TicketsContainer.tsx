@@ -8,7 +8,7 @@ function TicketsContainer(props: TicketsContainerPropsType) {
 
 	return (
 		<section className={classes.TicketsContainer}>
-			tickets
+			Tickets
 			<hr/>
 			{props.children}
 		</section>

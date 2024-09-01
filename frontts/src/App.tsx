@@ -213,7 +213,7 @@ function App() {
 				const name = getCandidateName(ticket.candidateId);
 				setLogs([
 					...logs,
-					"Added ticket " + ticket.ticket + " from " + name,
+					"Added vote " + ticket.ticket + " for " + name,
 				]);
 			})
 			.catch((err) => alert(err.response.data.message));
@@ -248,7 +248,7 @@ function App() {
 	}, [state]);
 	return (
 		<div className={classes.App}>
-			<Header title="App" />
+			<Header title="2D PARTY VOTING SYSTEM" />
 			<Main>
 				<Menu>
 					<hr />
@@ -258,14 +258,14 @@ function App() {
 					<Link className={classes.Link} to="/candidates">
 						Candidates
 					</Link>
+					<Link className={classes.Link} to="/votes">
+						Votes
+					</Link>
 					<Link className={classes.Link} to="/tickets">
 						Tickets
 					</Link>
-					<Link className={classes.Link} to="/pool">
-						Pool
-					</Link>
-					<Link className={classes.Link} to="/table">
-						Table
+					<Link className={classes.Link} to="/results">
+						Results
 					</Link>
 					<hr />
 					<Button
@@ -404,7 +404,7 @@ function App() {
 					/>
 
 					<Route
-						path="/tickets"
+						path="/votes"
 						element={
 							<Center>
 								<Form
@@ -428,7 +428,7 @@ function App() {
 										<Input
 											typeInput="text"
 											name="ticket"
-											placeholder="ticket"
+											placeholder="Ticket"
 											value=""
 											required
 										/>
@@ -449,33 +449,15 @@ function App() {
 											: null}
 									</div>
 								</Form>
-								<TicketsContainer>
-									{activeCategory && activeCategory.tickets
-										? activeCategory.tickets.map((t) => (
-												<TicketCard key={v4()} ticket={t}>
-													<Button
-														click={() =>
-															deleteTicket(
-																activeCategory._id!,
-																t._id
-															)
-														}
-													>
-														Delete
-													</Button>
-												</TicketCard>
-										  ))
-										: null}
-								</TicketsContainer>
 							</Center>
 						}
 					/>
 					<Route
-						path="/table"
+						path="/results"
 						element={<TableContainer state={state} />}
 					/>
 					<Route
-						path="/pool"
+						path="/tickets"
 						element={
 							<Center>
 								<Form submit={addPool}>
@@ -508,24 +490,7 @@ function App() {
 									/>
 									<Button>Add</Button>
 								</Form>
-								<CandidatesContainer>
-									{activeCategory && activeCategory.candidates
-										? activeCategory.candidates.map((с) => (
-												<CandidateCard key={v4()} candidate={с}>
-													<Button
-														click={() =>
-															deleteCandidate(
-																activeCategory._id!,
-																с._id!
-															)
-														}
-													>
-														Delete
-													</Button>
-												</CandidateCard>
-										  ))
-										: null}
-								</CandidatesContainer>
+								visitors
 							</Center>
 						}
 					/>

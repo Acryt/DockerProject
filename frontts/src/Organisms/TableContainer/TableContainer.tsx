@@ -42,7 +42,7 @@ export function TableContainer(props: TableContainerPropsType) {
 				<thead>
 					<tr>
 						<th>Candidate</th>
-						<th>Sum</th>
+						<th>Votes</th>
 					</tr>
 				</thead>
 				<tbody>
