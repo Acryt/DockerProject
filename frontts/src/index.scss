@@ -1,3 +1,4 @@
+@import "./Utilites/variables";
 * {
   margin: 0;
   padding: 0;
@@ -23,4 +24,27 @@ h2 {
 }
 h3 {
   font-size: 1.25rem;
+}
+
+dialog {
+  position: fixed;
+  z-index: 999;
+  margin: auto;
+  top: calc(50% - 25px);
+  padding: 12px;
+  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: $glass;
+	box-shadow: $shadow;
+  border: unset;
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+  border-radius: 4px;
+
+  p {
+    width: 100%;
+  }
+
 }

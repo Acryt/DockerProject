@@ -51,6 +51,8 @@ function App() {
 	const [logs, setLogs] = useState<string[]>(["..."]);
 	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
 	let filteredState: StateType = state;
+	const [modalState, setModalState] = useState<boolean | undefined>(false);
+	const [delId, setDelId] = useState<string>('');
 
 	useEffect(() => {
 		console.log("useEffect");
@@ -95,7 +97,7 @@ function App() {
 			.then(() => console.log("rem done id=" + id))
 			.catch((err) => setLogs([...logs, "Error: " + err]));
 		setState(s);
-		setActiveCategory(s[s.length - 1]);
+		setActiveCategory(s[s.length - 1] ? s[s.length - 1] : undefined);
 		setActiveCandidate(
 			s[s.length - 1]
 				? s[s.length - 1].candidates[0]
@@ -139,16 +141,18 @@ function App() {
 	async function addPool(pool: PoolType) {
 		console.log("addPool");
 		axios
-		.post("/api/addPool", pool)
-		.then((res) => {
-			const s = state.filter(
-				(category) => category._id !== pool.categoryId
-			);
-			s.push(res.data! as CategoryType);
-			setState(s);
-		})
-		.then(() => setLogs([...logs, "Added Pool " + pool.min + " - " + pool.max]))
-		.catch((err) => console.log(err));
+			.post("/api/addPool", pool)
+			.then((res) => {
+				const s = state.filter(
+					(category) => category._id !== pool.categoryId
+				);
+				s.push(res.data! as CategoryType);
+				setState(s);
+			})
+			.then(() =>
+				setLogs([...logs, "Added Pool " + pool.min + " - " + pool.max])
+			)
+			.catch((err) => console.log(err));
 	}
 	function deleteCandidate(categoryId: string, id: string) {
 		console.log("deleteCandidate");
@@ -314,15 +318,27 @@ function App() {
 									{filteredState.map((category) => (
 										<CategoryCard key={v4()} category={category}>
 											<Button
-												click={() =>
-													removeCategory(category._id! as string)
-												}
+												click={() => {
+													setModalState(true);
+													setDelId(category._id!)
+												}}
 											>
 												Delete
 											</Button>
 										</CategoryCard>
 									))}
 								</CategoriesContainer>
+								{modalState ? <dialog open>
+									<p>Are you sure you want to delete category {state.find((category) => category._id === delId)?.title}?</p>
+									<Button click={() => setModalState(false)}>Close</Button>
+									<Button
+										click={() => {
+											console.log(delId);
+											removeCategory(delId);
+											setModalState(false);
+										}}
+									>Ok</Button>
+								</dialog> : null}
 							</Center>
 						}
 					/>
