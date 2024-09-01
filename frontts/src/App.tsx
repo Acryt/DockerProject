@@ -377,11 +377,10 @@ function App() {
 												<CandidateCard key={v4()} candidate={с}>
 													<Button
 														click={() =>
-															deleteCandidate(
-																activeCategory._id!,
-																с._id!
-															)
-														}
+														{
+															setModalState(true);
+															setDelId(с._id!)
+														}}
 													>
 														Delete
 													</Button>
@@ -389,6 +388,17 @@ function App() {
 										  ))
 										: null}
 								</CandidatesContainer>
+								{modalState ? <dialog open>
+									<p>Are you sure you want to delete {activeCategory?.candidates.find((c) => c._id === delId)!.name} ?</p>
+									<Button click={() => setModalState(false)}>Close</Button>
+									<Button
+										click={() => {
+											console.log(delId);
+											deleteCandidate(activeCategory!._id!, delId);
+											setModalState(false);
+										}}
+									>Ok</Button>
+								</dialog> : null}
 							</Center>
 						}
 					/>
