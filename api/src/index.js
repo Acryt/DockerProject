@@ -48,7 +48,6 @@ app.get("/getData", async (req, res) => {
 	let x = await Category.find();
 	res.send(x);
 });
-
 app.post("/addCategory", async (req, res) => {
 	try {
 		const x = new Category(req.body);
@@ -68,7 +67,10 @@ app.delete("/deleteCategory", async (req, res) => {
 	const doc = await Category.findOneAndDelete(filter);
 	res.status(200).json(doc);
 });
-
+app.get("/getPool", async (req, res) => {
+	let x = await Pool.find();
+	res.send(x);
+})
 app.post("/addPool", async (req, res) => {
 	let min = toNumber(req.body.min);
 	let max = toNumber(req.body.max);
