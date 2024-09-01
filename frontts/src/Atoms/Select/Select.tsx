@@ -13,7 +13,6 @@ export function Select(props: SelectPropsType) {
 	const [selectValue, setSelectValue] = useState<string>("");
 
 	function selectHandler(e: any) {
-		console.log("select change");
 		setSelectValue(e.target.value);
 		if (props.change) {
 			props.change(e);

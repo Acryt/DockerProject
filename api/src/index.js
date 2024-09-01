@@ -11,20 +11,23 @@ const ticketSchema = new mongoose.Schema({
 	ticket: { type: String },
 	candidateId: { type: String },
 });
+const poolTicketsSchema = new mongoose.Schema({
+	min: { type: String },
+	max: { type: String },
+});
 const categoryShchema = new mongoose.Schema({
 	title: { type: String },
 	date: { type: Date, default: new Date() },
 	status: { type: String },
 	candidates: [candidateSchema],
 	tickets: [ticketSchema],
+	pool: [poolTicketsSchema],
 });
-const pullTicketsSchema = new mongoose.Schema({
-	categoryId: { type: String },
-	ticket: { type: String },
-});
+
 
 const Category = mongoose.model("Category", categoryShchema);
 const Candidate = mongoose.model("Candidate", candidateSchema);
+const Pool = mongoose.model("Pool", poolTicketsSchema);
 const Ticket = mongoose.model("Ticket", ticketSchema);
 
 app.use(express.json());
@@ -54,7 +57,7 @@ app.post("/addCategory", async (req, res) => {
 		res.send(result);
 	} catch (error) {
 		res.status(500).send({
-			message: "Error saving category to database",
+			message: "Error saving Category to DB",
 			error: error,
 		});
 	}
@@ -66,6 +69,29 @@ app.delete("/deleteCategory", async (req, res) => {
 	res.status(200).json(doc);
 });
 
+app.post("/addPool", async (req, res) => {
+	try {
+		const p = new Pool({ name: req.body.name });
+		const category = await Category.findById(req.body.categoryId);
+		category.pool.push(c);
+		const result = await category.save();
+		res.send(result);
+	} catch (error) {
+		res.status(500).send({
+			message: "Error saving Pool to DB",
+			error: error,
+		});
+	}
+});
+app.delete("/deletePool", async (req, res) => {
+	const { categoryId, id } = req.body;
+	let category = await Category.findById(categoryId);
+	category.pool = category.pool.filter((p) => p._id != id);
+	const result = await category.save();
+	console.log(result);
+	res.status(200).json(result);
+});
+
 app.post("/addCandidate", async (req, res) => {
 	try {
 		const c = new Candidate({ name: req.body.name });
@@ -75,7 +101,7 @@ app.post("/addCandidate", async (req, res) => {
 		res.send(result);
 	} catch (error) {
 		res.status(500).send({
-			message: "Error saving category to database",
+			message: "Error saving Candidate to DB",
 			error: error,
 		});
 	}
@@ -108,7 +134,7 @@ app.post("/addTicket", async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).send({
-			message: "Error saving category to database",
+			message: "Error saving Ticket to DB",
 			error: error,
 		});
 	}

@@ -1,0 +1,10 @@
+@import '../../Utilites/variables';
+.File {
+	position: relative;
+	border: 1px solid #8080a0;
+	border-radius: 4px;
+	padding: 0px 4px;
+	cursor: pointer;
+	color: #000;
+	background: $c-normal;
+}

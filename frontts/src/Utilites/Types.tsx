@@ -11,6 +11,7 @@ export type FormPropsType = {
 	title?: string;
 	submit?: any;
 	children?: any;
+	className?: string;
 };
 export type InputPropsType = {
 	name?: string;
@@ -27,12 +28,16 @@ export type MainPropsType = {
 };
 export type SidebarPropsType = {
    children?: any;
+	logs: Array<string>;
+	setLogs: Function;
 }
 export type ButtonPropsType = {
 	title?: string;
 	typeButton?: "submit" | "reset" | "button" | undefined;
 	click?: MouseEventHandler<HTMLButtonElement>;
 	children?: any;
+	name?: string;
+	value?: string;
 };
 export type OptionPropsType = {
 	title: string;
@@ -56,6 +61,12 @@ export type CandidateType = {
 	categoryId: string;
 	name: string;
 };
+export type PoolType = {
+	_id?: string;
+	categoryId: string;
+	min: string;
+	max: string;
+}
 export type TicketType = {
 	_id?: string;
 	ticket: string;
@@ -64,5 +75,3 @@ export type TicketType = {
 };
 export type StatusType = "active" | "inactive";
 export type FilterStateType = StatusType | "all";
-
-export type ViewType = 'categories' | 'candidates' | 'tickets';

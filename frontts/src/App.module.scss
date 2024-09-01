@@ -1,23 +1,79 @@
-@import './Utilites/variables';
+@import "./Utilites/variables";
 
 .App {
-  text-align: center;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: $c-primary;
-  color: $c-normal;
+	text-align: center;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background: $c-primary;
+	color: $c-normal;
 }
 .Link {
-  background: $c-normal;
+	background: $c-normal;
 	border-radius: 4px;
 	border: 1px solid $c-tertiary;
 	padding: 4px;
+	color: #000;
+	text-decoration: none;
 
 	&:hover {
 		background-color: $c-hover;
 	}
 	&:active {
 		background-color: $c-active;
+	}
+}
+
+.FormTickets {
+	flex-direction: column;
+	align-items: center;
+	background: unset !important;
+	box-shadow: unset !important;
+
+	div:first-of-type {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		
+		padding: 12px;
+		border-radius: 4px;
+		background: $c-secondary;
+		box-shadow: $shadow;
+	}
+	div:last-of-type {
+		display: flex;
+		padding: 12px;
+		gap: 12px;
+		flex-wrap: wrap;
+		justify-content: center;
+		border-radius: 4px;
+		background: $c-secondary;
+		box-shadow: $shadow;
+	}
+	[name="categoryId"] {
+		height: 40px;
+		min-width: 200px;
+		text-align: center;
+	}
+	[name="ticket"] {
+		width: 200px;
+		font-size: 2rem;
+		text-align: center;
+	}
+	
+	button {
+		display: flex;
+		// justify-content: center;
+		align-items: center;
+		gap: 4px;
+		width: 200px;
+		// height: 80px;
+		padding: 12px;
+		img {
+			width: 48px;
+			height: 48px;
+			background-color: #00ffaa;
+			border-radius: 50%;
+		}
 	}
 }

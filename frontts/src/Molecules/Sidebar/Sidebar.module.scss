@@ -2,20 +2,18 @@
 .Sidebar {
 	background: $c-secondary;
 	color: $c-normal;
-	flex: 0 0 200px;
+	flex: 0 0 300px;
 	z-index: 3;
 	box-shadow: $shadow;
 	padding: $header+$padding $padding $footer+$padding $padding;
 
-	&__data {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: center;
-		gap: 20px;
+	button {
+		margin: 12px 0;
 	}
-	&__card {
-		border: 1px solid #ffffff;
-		border-radius: 12px;
+	p {
+		color: $c-disable;
+	}
+	p:first-of-type {
+		color: $c-normal;
 	}
 }

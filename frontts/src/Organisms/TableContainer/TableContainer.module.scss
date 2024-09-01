@@ -1,0 +1,22 @@
+@import "../../Utilites/variables";
+.TableContainer {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $padding;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+
+	select,
+	table {
+		width: 100%;
+	}
+
+	table {
+		padding: 4px;
+		background: $c-secondary;
+		color: $c-normal;
+		box-shadow: $shadow;
+		border-radius: 4px;
+	}
+}

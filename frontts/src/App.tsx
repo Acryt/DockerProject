@@ -1,7 +1,7 @@
 import classes from "./App.module.scss";
 
 // React
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { v4 } from "uuid";
@@ -22,32 +22,57 @@ import CandidatesContainer from "./Organisms/CandidatesContainer/CandidatesConta
 import Option from "./Atoms/Option/Option";
 import Input from "./Atoms/Input/Input";
 import Select from "./Atoms/Select/Select";
+import Home from "./Molecules/Home/Home";
+import CandidateCard from "./Molecules/CandidateCard/CandidateCard";
+import TicketCard from "./Molecules/TicketCard/TicketCard";
 
 // Types
 import {
-	ViewType,
 	StateType,
 	FilterStateType,
 	ActiveCandidate,
 	CategoryType,
 	CandidateType,
 	TicketType,
+	PoolType,
 } from "./Utilites/Types";
-import CandidateCard from "./Molecules/CandidateCard/CandidateCard";
-import TicketCard from "./Molecules/TicketCard/TicketCard";
+import FileInput from "./Atoms/File/FileInput";
+import TableContainer from "./Organisms/TableContainer/TableContainer";
+import ButtonCandidate from "./Atoms/ButtonCandidate/ButtonCandidate";
 
 function App() {
 	const [state, setState] = useState<StateType>([]);
+	const [activeCategory, setActiveCategory] = useState<
+		CategoryType | undefined
+	>();
+	const [activeCandidate, setActiveCandidate] = useState<
+		ActiveCandidate | undefined
+	>();
+	const [logs, setLogs] = useState<string[]>(["..."]);
+	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
+	let filteredState: StateType = state;
+
 	useEffect(() => {
 		console.log("useEffect");
 		let promise = axios.get("/api/getData");
-		promise.then((res: AxiosResponse<any>) => {
-			if (res.data) {
-				setState(res.data);
-			}
-		});
-		console.log("axios done");
+		promise
+			.then((res: AxiosResponse<any>) => {
+				if (res.data) {
+					setState(res.data);
+					setActiveCategory(res.data[0] ? res.data[0] : undefined);
+					setActiveCandidate(
+						res.data[0]
+							? res.data[0].candidates[0]
+								? res.data[0].candidates[0]._id
+								: undefined
+							: undefined
+					);
+				}
+			})
+			.then(() => setLogs([...logs, "Data loaded"]))
+			.then(() => console.log("axios done"));
 	}, []);
+
 	function addCategory(category: CategoryType) {
 		console.log("addCategory");
 		axios
@@ -55,39 +80,41 @@ function App() {
 			.then((res) => (category = { ...category, _id: res.data._id }))
 			.then(() => setState([...state, category]))
 			.then(() => setActiveCategory(category))
+			.then(() => setLogs([...logs, "Added category " + category.title]))
 			.then(() => console.log("add done id=" + category._id))
-			.catch((err) => console.log(err));
+			.catch((err) => setLogs([...logs, "Error: " + err]));
 	}
 	function removeCategory(id: string) {
 		console.log("removeCategory");
-		let s = state.filter((category) => id !== category._id);
+		const rem = state.find((category) => id === category._id);
+		const s = state.filter((category) => id !== category._id);
 		axios
 			.delete("/api/deleteCategory", { data: { id: id } })
+			.then(() => setLogs([...logs, "Removed category " + rem?.title]))
 			.then(() => setState(s))
-			.then(() => console.log("rem done id=" + id));
+			.then(() => console.log("rem done id=" + id))
+			.catch((err) => setLogs([...logs, "Error: " + err]));
 		setState(s);
+		setActiveCategory(s[s.length - 1]);
+		setActiveCandidate(
+			s[s.length - 1]
+				? s[s.length - 1].candidates[0]
+					? s[s.length - 1].candidates[0]._id
+					: undefined
+				: undefined
+		);
 	}
-
-	const [view, setView] = useState<ViewType>("categories");
-	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
-	let filteredState: StateType = state;
-	const [activeCategory, setActiveCategory] = useState<
-		CategoryType | undefined
-	>(state[0] ? state[state.length - 1] : undefined);
 
 	function changeActiveCategory(e: any) {
 		console.log("changeActiveCategory");
-		const activeCategory = state.find(
-			(category) => category._id === e.target.value
-		);
-		if (activeCategory) {
-			setActiveCategory(activeCategory);
+		const active = state.find((category) => category._id === e.target.value);
+		if (active) {
+			setActiveCategory(active);
 		} else {
-			console.log("Голосование не найдено");
+			console.log("Категория не найдена");
 		}
 	}
 
-	const [activeCandidate, setActiveCandidate] = useState<ActiveCandidate>("");
 	async function addCandidate(candidate: CandidateType) {
 		console.log("addCandidate");
 		axios
@@ -98,29 +125,64 @@ function App() {
 				);
 				s.push(res.data! as CategoryType);
 				setState(s);
+				setActiveCandidate(
+					res.data!.candidates[0]
+						? res.data!.candidates.find(
+								(c: CandidateType) => c.name === candidate.name
+						  )._id
+						: undefined
+				);
 			})
+			.then(() => setLogs([...logs, "Added candidate " + candidate.name]))
 			.catch((err) => console.log(err));
+	}
+	async function addPool(pool: PoolType) {
+		// console.log("addPool");
+		// axios
+		// .post("/api/addPool", pool)
+		// .then((res) => {
+		// 	const s = state.filter(
+		// 		(category) => category._id !== pool.categoryId
+		// 	);
+		// 	s.push(res.data! as CategoryType);
+		// 	setState(s);
+		// })
+		// .then(() => setLogs([...logs, "Added Pool " + pool.min + " - " + pool.max]))
+		// .catch((err) => console.log(err));
 	}
 	function deleteCandidate(categoryId: string, id: string) {
 		console.log("deleteCandidate");
+
 		axios
 			.delete("/api/deleteCandidate", {
 				data: { categoryId: categoryId, id: id },
 			})
 			.then((res) => {
+				const rem = state
+					.find((category) => category._id === res.data._id)!
+					.candidates.find((candidate) => candidate._id === id);
 				const s = state.filter((category) => category._id !== res.data._id);
 				s.push(res.data! as CategoryType);
+				setLogs([...logs, "Removed candidate " + rem?.name]);
 				setState(s);
+				setActiveCandidate(
+					activeCategory?.candidates[0]._id!
+						? activeCategory?.candidates[0]._id
+						: undefined
+				);
 			})
 			.catch((err) => console.log(err));
 	}
-
+	function getCandidateName(candidateId: string) {
+		const candidate = state
+			.map((category) => category.candidates)
+			.flat()
+			.find((candidate) => candidate._id === candidateId);
+		return candidate ? candidate.name : undefined;
+	}
 	function changeActiveCandidate(e: any) {
 		console.log(e.target.value);
 		setActiveCandidate(e.target.value);
-	}
-	function changeView(view: ViewType) {
-		setView(view);
 	}
 	if (categoryFilter !== "all") {
 		filteredState = state.filter(
@@ -133,7 +195,6 @@ function App() {
 	}
 
 	async function addTicket(ticket: TicketType) {
-		console.log("addTicket");
 		axios
 			.post("/api/addTicket", ticket)
 			.then((res) => {
@@ -145,52 +206,63 @@ function App() {
 				s.push(res.data! as CategoryType);
 				console.log(s);
 				setState(s);
+				const name = getCandidateName(ticket.candidateId);
+				setLogs([
+					...logs,
+					"Added ticket " + ticket.ticket + " from " + name,
+				]);
 			})
-			.catch((err) => console.log(err));
+			.catch((err) => alert(err.response.data.message));
 	}
 
 	function deleteTicket(categoryId: string, id: any) {
-		console.log(categoryId);
-		console.log(id);
 		axios
 			.delete("/api/deleteTicket", {
 				data: { categoryId: categoryId, id: id },
 			})
 			.then((res) => {
+				const rem = state
+					.find((category) => category._id === res.data._id)
+					?.tickets.find((ticket) => ticket._id === id) as TicketType;
+				const name = getCandidateName(rem.candidateId);
 				const s = state.filter((category) => category._id !== res.data._id);
 				s.push(res.data! as CategoryType);
 				setState(s);
+				setLogs([
+					...logs,
+					"Removed ticket " + rem.ticket + " from " + name,
+				]);
 			})
 			.catch((err) => console.log(err));
 	}
 	useEffect(() => {
-		console.log("useEffect без axios");
 		setState(state);
 		const newCategory = state.find(
 			(category) => category._id === activeCategory?._id
 		);
 		setActiveCategory(newCategory);
 	}, [state]);
-
 	return (
 		<div className={classes.App}>
 			<Header title="App" />
 			<Main>
-				<Menu view={view}>
+				<Menu>
 					<hr />
-					<Button
-						title="Categories"
-						click={() => changeView("categories")}
-					/>
-					<Button
-						title="Candidates"
-						click={() => changeView("candidates")}
-					/>
-					<Button title="Tickets" click={() => changeView("tickets")} />
-					<hr />
-					<Link className={classes.Link} to="/categories">Categories</Link>
-					<Link className={classes.Link} to="/candidates">Candidates</Link>
-					<Link className={classes.Link} to="/tickets">Tickets</Link>
+					<Link className={classes.Link} to="/categories">
+						Categories
+					</Link>
+					<Link className={classes.Link} to="/candidates">
+						Candidates
+					</Link>
+					<Link className={classes.Link} to="/tickets">
+						Tickets
+					</Link>
+					<Link className={classes.Link} to="/pool">
+						Pool
+					</Link>
+					<Link className={classes.Link} to="/table">
+						Table
+					</Link>
 					<hr />
 					<Button
 						title="All Categories"
@@ -206,128 +278,233 @@ function App() {
 					/>
 				</Menu>
 
-				{view === "categories" && (
-					<Center>
-						<Form submit={addCategory}>
-							<Input
-								typeInput="text"
-								name="title"
-								placeholder="title"
-								value=""
-							/>
-							<Select name="status">
-								<Option title="active" value="active" />
-								<Option title="inactive" value="inactive" />
-							</Select>
-							<Input typeInput="date" name="date" value="" required />
-							<Button>Add</Button>
-						</Form>
-						<CategoriesContainer>
-							{filteredState.map((category) => (
-								<CategoryCard key={v4()} category={category}>
-									<Button
-										click={() =>
-											removeCategory(category._id! as string)
-										}
-									>
-										Delete
-									</Button>
-								</CategoryCard>
-							))}
-						</CategoriesContainer>
-					</Center>
-				)}
-				{view === "candidates" && (
-					<Center>
-						<Form submit={addCandidate}>
-							<Select name="categoryId" change={changeActiveCategory}>
-								{state.map((category) => (
-									<Option
-										key={v4()}
-										title={category.title}
-										value={category._id}
+				<Routes>
+					<Route
+						path="/"
+						element={
+							<Center>
+								<Home />
+							</Center>
+						}
+					/>
+					<Route
+						path="/categories"
+						element={
+							<Center>
+								<Form submit={addCategory}>
+									<Input
+										typeInput="text"
+										name="title"
+										placeholder="title"
+										value=""
 									/>
-								))}
-							</Select>
-							<Input
-								typeInput="text"
-								name="name"
-								placeholder="candidate"
-								value=""
-								required
-							/>
-							<Button>Add</Button>
-						</Form>
-						<CandidatesContainer>
-							{activeCategory && activeCategory.candidates
-								? activeCategory.candidates.map((с) => (
-										<CandidateCard key={v4()} candidate={с}>
+									<Select name="status">
+										<Option title="active" value="active" />
+										<Option title="inactive" value="inactive" />
+									</Select>
+									<Input
+										typeInput="date"
+										name="date"
+										value=""
+										required
+									/>
+									<Button>Add</Button>
+								</Form>
+								<CategoriesContainer>
+									{filteredState.map((category) => (
+										<CategoryCard key={v4()} category={category}>
 											<Button
 												click={() =>
-													deleteCandidate(
-														activeCategory._id!,
-														с._id!
-													)
+													removeCategory(category._id! as string)
 												}
 											>
 												Delete
 											</Button>
-										</CandidateCard>
-								  ))
-								: null}
-						</CandidatesContainer>
-					</Center>
-				)}
-				{view === "tickets" && (
-					<Center>
-						<Form submit={addTicket}>
-							<Select name="categoryId" change={changeActiveCategory}>
-								{state.map((category) => (
-									<Option
-										key={v4()}
-										title={category.title}
-										value={category._id}
-									/>
-								))}
-							</Select>
-							<Select name="candidateId" change={changeActiveCandidate}>
-								{activeCategory && activeCategory.candidates
-									? activeCategory.candidates.map((c) => (
+										</CategoryCard>
+									))}
+								</CategoriesContainer>
+							</Center>
+						}
+					/>
+
+					<Route
+						path="/candidates"
+						element={
+							<Center>
+								<Form submit={addCandidate}>
+									<Select
+										name="categoryId"
+										change={changeActiveCategory}
+									>
+										<Option title="Select category" value="" />
+										{state.map((category) => (
 											<Option
 												key={v4()}
-												title={c.name}
-												value={c._id}
+												title={category.title}
+												value={category._id}
 											/>
-									  ))
-									: null}
-							</Select>
-							<Input
-								typeInput="text"
-								name="ticket"
-								placeholder="ticket"
-								value=""
-								required
-							/>
-							<Button>Add</Button>
-						</Form>
-						<TicketsContainer>
-							{activeCategory && activeCategory.tickets
-								? activeCategory.tickets.map((t) => (
-										<TicketCard key={v4()} ticket={t}>
-											<Button
-												click={() =>
-													deleteTicket(activeCategory._id!, t._id)
-												}
-											>
-												Delete
-											</Button>
-										</TicketCard>
-								  ))
-								: null}
-						</TicketsContainer>
-					</Center>
-				)}
-				<Sidebar />
+										))}
+									</Select>
+									<Input
+										typeInput="text"
+										name="name"
+										placeholder="candidate"
+										value=""
+										required
+									/>
+									<FileInput name="file" value="" />
+									<Button>Add</Button>
+								</Form>
+								<CandidatesContainer>
+									{activeCategory && activeCategory.candidates
+										? activeCategory.candidates.map((с) => (
+												<CandidateCard key={v4()} candidate={с}>
+													<Button
+														click={() =>
+															deleteCandidate(
+																activeCategory._id!,
+																с._id!
+															)
+														}
+													>
+														Delete
+													</Button>
+												</CandidateCard>
+										  ))
+										: null}
+								</CandidatesContainer>
+							</Center>
+						}
+					/>
+
+					<Route
+						path="/tickets"
+						element={
+							<Center>
+								<Form
+									submit={addTicket}
+									className={classes.FormTickets}
+								>
+									<div>
+										<Select
+											name="categoryId"
+											change={changeActiveCategory}
+										>
+											<Option title="Select category" value="" />
+											{state.map((category) => (
+												<Option
+													key={v4()}
+													title={category.title}
+													value={category._id}
+												/>
+											))}
+										</Select>
+										<Input
+											typeInput="text"
+											name="ticket"
+											placeholder="ticket"
+											value=""
+											required
+										/>
+									</div>
+									<hr />
+									<div>
+										{activeCategory && activeCategory.candidates
+											? activeCategory.candidates.map((c) => (
+													<Button
+														key={v4()}
+														name="candidateId"
+														value={c._id}
+													>
+														<img src="" />
+														<p>{c.name}</p>
+													</Button>
+											  ))
+											: null}
+									</div>
+								</Form>
+								<TicketsContainer>
+									{activeCategory && activeCategory.tickets
+										? activeCategory.tickets.map((t) => (
+												<TicketCard key={v4()} ticket={t}>
+													<Button
+														click={() =>
+															deleteTicket(
+																activeCategory._id!,
+																t._id
+															)
+														}
+													>
+														Delete
+													</Button>
+												</TicketCard>
+										  ))
+										: null}
+								</TicketsContainer>
+							</Center>
+						}
+					/>
+					<Route
+						path="/table"
+						element={<TableContainer state={state} />}
+					/>
+					<Route
+						path="/pool"
+						element={
+							<Center>
+								<Form submit={addPool}>
+									<Select
+										name="categoryId"
+										change={changeActiveCategory}
+									>
+										<Option title="Select category" value="" />
+										{state.map((category) => (
+											<Option
+												key={v4()}
+												title={category.title}
+												value={category._id}
+											/>
+										))}
+									</Select>
+									<Input
+										typeInput="text"
+										name="min"
+										placeholder="min"
+										value=""
+										required
+									/>
+									<Input
+										typeInput="text"
+										name="max"
+										placeholder="max"
+										value=""
+										required
+									/>
+									<Button>Add</Button>
+								</Form>
+								<CandidatesContainer>
+									{activeCategory && activeCategory.candidates
+										? activeCategory.candidates.map((с) => (
+												<CandidateCard key={v4()} candidate={с}>
+													<Button
+														click={() =>
+															deleteCandidate(
+																activeCategory._id!,
+																с._id!
+															)
+														}
+													>
+														Delete
+													</Button>
+												</CandidateCard>
+										  ))
+										: null}
+								</CandidatesContainer>
+							</Center>
+						}
+					/>
+				</Routes>
+				<Sidebar logs={logs} setLogs={setLogs} />
 			</Main>
 			<Footer />
 		</div>
