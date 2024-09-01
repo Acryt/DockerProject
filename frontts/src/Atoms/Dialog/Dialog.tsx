@@ -5,11 +5,10 @@ type DialogPropsType = {
 	title: string;
 	ok?: MouseEventHandler<HTMLButtonElement>;
 	cancel?: MouseEventHandler<HTMLButtonElement>;
-	isOpen: boolean;
 };
 export function Dialog(props: DialogPropsType) {
 	return (
-		<dialog open={props.isOpen}>
+		<dialog open>
 			<p>{props.title}</p>
 			{props.cancel ? <Button click={props.cancel}>Cancel</Button> : ""}
 			{props.ok ? <Button click={props.ok}>Ok</Button> : ""}

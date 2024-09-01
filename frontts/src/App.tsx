@@ -39,14 +39,12 @@ import {
 import FileInput from "./Atoms/File/FileInput";
 import TableContainer from "./Organisms/TableContainer/TableContainer";
 import ButtonCandidate from "./Atoms/ButtonCandidate/ButtonCandidate";
+import Dialog from "./Atoms/Dialog/Dialog";
 
 function App() {
 	const [state, setState] = useState<StateType>([]);
 	const [activeCategory, setActiveCategory] = useState<
 		CategoryType | undefined
-	>();
-	const [activeCandidate, setActiveCandidate] = useState<
-		ActiveCandidate | undefined
 	>();
 	const [logs, setLogs] = useState<string[]>(["..."]);
 	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
@@ -63,20 +61,19 @@ function App() {
 				if (res.data) {
 					setState(res.data);
 					setActiveCategory(res.data[0] ? res.data[0] : undefined);
-					setActiveCandidate(
-						res.data[0]
-							? res.data[0].candidates[0]
-								? res.data[0].candidates[0]._id
-								: undefined
-							: undefined
-					);
 				}
 			})
 			.then(() => setLogs([...logs, "Data loaded"]))
 			.then(() => console.log("axios done"));
 	}, []);
 
-	function addCategory(category: CategoryType) {
+    useEffect(() => {
+        setState(state);
+        const newCategory = state.find((category) => category._id === activeCategory?._id);
+        setActiveCategory(newCategory);
+    }, [state]);
+
+    function addCategory(category: CategoryType) {
 		console.log("addCategory");
 		axios
 			.post("/api/addCategory", category)
@@ -99,13 +96,6 @@ function App() {
 			.catch((err) => setLogs([...logs, "Error: " + err]));
 		setState(s);
 		setActiveCategory(s[s.length - 1] ? s[s.length - 1] : undefined);
-		setActiveCandidate(
-			s[s.length - 1]
-				? s[s.length - 1].candidates[0]
-					? s[s.length - 1].candidates[0]._id
-					: undefined
-				: undefined
-		);
 	}
 
 	function changeActiveCategory(e: any) {
@@ -128,13 +118,6 @@ function App() {
 				);
 				s.push(res.data! as CategoryType);
 				setState(s);
-				setActiveCandidate(
-					res.data!.candidates[0]
-						? res.data!.candidates.find(
-								(c: CandidateType) => c.name === candidate.name
-						  )._id
-						: undefined
-				);
 			})
 			.then(() => setLogs([...logs, "Added candidate " + candidate.name]))
 			.catch((err) => console.log(err));
@@ -170,11 +153,6 @@ function App() {
 				s.push(res.data! as CategoryType);
 				setLogs([...logs, "Removed candidate " + rem?.name]);
 				setState(s);
-				setActiveCandidate(
-					activeCategory?.candidates[0]._id!
-						? activeCategory?.candidates[0]._id
-						: undefined
-				);
 			})
 			.catch((err) => console.log(err));
 	}
@@ -184,10 +162,6 @@ function App() {
 			.flat()
 			.find((candidate) => candidate._id === candidateId);
 		return candidate ? candidate.name : undefined;
-	}
-	function changeActiveCandidate(e: any) {
-		console.log(e.target.value);
-		setActiveCandidate(e.target.value);
 	}
 	if (categoryFilter !== "all") {
 		filteredState = state.filter(
@@ -220,45 +194,23 @@ function App() {
 			.catch((err) => alert(err.response.data.message));
 	}
 
-	function deleteTicket(categoryId: string, id: any) {
-		axios
-			.delete("/api/deleteTicket", {
-				data: { categoryId: categoryId, id: id },
-			})
-			.then((res) => {
-				const rem = state
-					.find((category) => category._id === res.data._id)
-					?.tickets.find((ticket) => ticket._id === id) as TicketType;
-				const name = getCandidateName(rem.candidateId);
-				const s = state.filter((category) => category._id !== res.data._id);
-				s.push(res.data! as CategoryType);
-				setState(s);
-				setLogs([
-					...logs,
-					"Removed ticket " + rem.ticket + " from " + name,
-				]);
-			})
-			.catch((err) => console.log(err));
-	}
-	useEffect(() => {
-		setState(state);
-		const newCategory = state.find(
-			(category) => category._id === activeCategory?._id
-		);
-		setActiveCategory(newCategory);
-	}, [state]);
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, state: CategoryType | undefined) => {
+        setActiveCategory(state)
+    };
 	return (
 		<div className={classes.App}>
 			<Header title="2D PARTY VOTING SYSTEM" />
 			<Main>
 				<Menu>
 					<hr />
-					<Link className={classes.Link} to="/categories">
+					<Link className={classes.Link} to="/categories" onClick={(e) => {handleClick(e, undefined)}}>
 						Categories
 					</Link>
-					<Link className={classes.Link} to="/candidates">
-						Candidates
-					</Link>
+                    {state[0] && <Link className={classes.Link} to="/candidates" onClick={(e) => {
+                        handleClick(e, state[0])
+                    }}>
+                        Candidates
+                    </Link>}
 					<Link className={classes.Link} to="/votes">
 						Votes
 					</Link>
@@ -329,17 +281,20 @@ function App() {
 										</CategoryCard>
 									))}
 								</CategoriesContainer>
-								{modalState ? <dialog open>
-									<p>Are you sure you want to delete category {state.find((category) => category._id === delIdCategory)?.title}?</p>
-									<Button click={() => setModalState(false)}>Close</Button>
-									<Button
-										click={() => {
-											console.log(delIdCategory);
-											removeCategory(delIdCategory);
-											setModalState(false);
-										}}
-									>Ok</Button>
-								</dialog> : null}
+                                {modalState && (
+                                    <Dialog
+                                        title={
+                                            "Are you sure you want to delete category " +
+                                            state.find((category) => category._id === delIdCategory)?.title +
+                                            "?"
+                                        }
+                                        cancel={() => setModalState(false)}
+                                        ok={() => {
+                                            removeCategory(delIdCategory);
+                                            setModalState(false);
+                                        }}
+                                    />
+                                )}
 							</Center>
 						}
 					/>
@@ -389,17 +344,16 @@ function App() {
 										  ))
 										: null}
 								</CandidatesContainer>
-								{modalState ? <dialog open>
-									<p>Are you sure you want to delete {activeCategory?.candidates.find((c) => c._id === delIdCandidate)!.name} ?</p>
-									<Button click={() => setModalState(false)}>Close</Button>
-									<Button
-										click={() => {
-											console.log(delIdCandidate);
-											deleteCandidate(activeCategory!._id!, delIdCandidate);
-											setModalState(false);
-										}}
-									>Ok</Button>
-								</dialog> : null}
+                                {modalState && (
+								<Dialog
+									title={"Are you sure you want to delete " + activeCategory?.candidates.find((c) => c._id === delIdCandidate)!.name + "?"}
+								    cancel={() => setModalState(false)}
+                                    ok={() => {
+                                        deleteCandidate(activeCategory!._id!, delIdCandidate);
+                                        setModalState(false);
+                                    }}
+                                    />
+                                )}
 							</Center>
 						}
 					/>
