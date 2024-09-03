@@ -241,7 +241,7 @@ app.post("/addVote", async (req, res) => {
 			// проверка есть ли такой ticket в Ticket
 			let t = await Ticket.findOne({ ticket: ticket });
 			if (t) {
-				throw new Error("Ticket already exists");
+				throw new Error("You have already voted in this category");
 			} else {
 				const t = new Ticket({
 					ticket: ticket,

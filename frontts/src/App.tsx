@@ -88,7 +88,9 @@ function App() {
 				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
 			});
 	}, []);
-
+	function initCatagory() {
+		if (stateCategory.length > 0) setActiveCategory(stateCategory[0]._id!);
+	}
 	function getCategory(id?: string) {
 		if (id) {
 			let promise = axios.get("/api/getCategory/" + id);
@@ -255,7 +257,12 @@ function App() {
 			});
 	}
 
-	function addTicket(ticket: TicketType) {
+	function addVote(ticket: {
+		prefix: string;
+		ticket: string;
+		categoryId: string;
+		candidateId: string;
+	}) {
 		axios
 			.post("/api/addVote", ticket)
 			.then((res) => {
@@ -265,7 +272,7 @@ function App() {
 					{
 						msg:
 							"Added vote " +
-							ticket.ticket +
+							ticket.prefix.toUpperCase() + ticket.ticket.toUpperCase() + 
 							" for " +
 							getCandidateName(ticket.candidateId),
 					},
@@ -277,11 +284,8 @@ function App() {
 			});
 	}
 
-	const handleClick = (
-		e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-		state: CategoryType | undefined
-	) => {
-		setActiveCategory(null);
+	const handleClick = () => {
+		setActiveCategory(stateCategory[0]._id! || null);
 	};
 
 	return (
@@ -293,9 +297,6 @@ function App() {
 					<Link
 						className={classes.Link}
 						to="/categories"
-						onClick={(e) => {
-							handleClick(e, undefined);
-						}}
 					>
 						Categories
 					</Link>
@@ -303,8 +304,8 @@ function App() {
 						<Link
 							className={classes.Link}
 							to="/candidates"
-							onClick={(e) => {
-								handleClick(e, stateCategory[0]);
+							onClick={() => {
+								handleClick();
 							}}
 						>
 							Candidates
@@ -354,6 +355,7 @@ function App() {
 									{stateCategory.map((category) => (
 										<CategoryCard key={v4()} category={category}>
 											<Button
+												key={v4()}
 												click={() => {
 													setModalState(true);
 													setDelIdCategory(category._id!);
@@ -416,13 +418,13 @@ function App() {
 										change={changeActiveCategory}
 										required
 									>
-										<Option title="Select category" value="" />
 										{stateCategory.map((category) => (
 											<Option
 												key={v4()}
 												title={category.title}
 												value={category._id}
 											/>
+											
 										))}
 									</Select>
 									<Input
@@ -437,6 +439,7 @@ function App() {
 										name="file"
 										placeholder="file"
 										value=""
+										required
 									/>
 									<Button>Add</Button>
 								</Form>
@@ -453,6 +456,7 @@ function App() {
 														stateCandidate={stateCandidate}
 													>
 														<Button
+															key={v4()}
 															click={() => {
 																setModalState(true);
 																setDelIdCandidate(с._id!);
@@ -489,7 +493,7 @@ function App() {
 						element={
 							<Center>
 								<Form
-									submit={addTicket}
+									submit={addVote}
 									className={classes.FormTickets}
 								>
 									<div>
@@ -519,6 +523,7 @@ function App() {
 											placeholder="Ticket"
 											value=""
 											required
+											key={v4()}
 										/>
 									</div>
 									<VoteContainer>
@@ -529,10 +534,12 @@ function App() {
 													)
 													.map((c) => (
 														<CandidateCard
+															key={v4()}
 															candidate={c._id}
 															stateCandidate={stateCandidate}
 														>
 															<Button
+																key={v4()}
 																name="candidateId"
 																value={c._id}
 															>
@@ -551,38 +558,41 @@ function App() {
 						path="/tickets"
 						element={
 							<Center>
-															<input
-							type="text"
-							name="pass"
-							placeholder="Password"
-							value={inputPass}
-							onChange={(e) => setInputPass(e.target.value)}
-						/>
-						{inputPass === pass ? (
-								<Form submit={addBatch}>
-									<Input
-										typeInput="text"
-										name="prefix"
-										placeholder="prefix"
-										value=""
-										required
-									/>
-									<Input
-										typeInput="text"
-										name="min"
-										placeholder="min"
-										value=""
-										required
-									/>
-									<Input
-										typeInput="text"
-										name="max"
-										placeholder="max"
-										value=""
-										required
-									/>
-									<Button>Add</Button>
-								</Form>) : <p>Wrong password</p>}
+								<input
+									type="text"
+									name="pass"
+									placeholder="Password"
+									value={inputPass}
+									onChange={(e) => setInputPass(e.target.value)}
+								/>
+								{inputPass === pass ? (
+									<Form submit={addBatch}>
+										<Input
+											typeInput="text"
+											name="prefix"
+											placeholder="prefix"
+											value=""
+											required
+										/>
+										<Input
+											typeInput="text"
+											name="min"
+											placeholder="min"
+											value=""
+											required
+										/>
+										<Input
+											typeInput="text"
+											name="max"
+											placeholder="max"
+											value=""
+											required
+										/>
+										<Button>Add</Button>
+									</Form>
+								) : (
+									<p>Wrong password</p>
+								)}
 							</Center>
 						}
 					/>
