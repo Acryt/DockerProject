@@ -8,6 +8,7 @@ type SelectPropsType = {
 	name: string;
 	change?: any;
 	children?: any;
+	required?: boolean;
 };
 export function Select(props: SelectPropsType) {
 	const [selectValue, setSelectValue] = useState<string>("");
@@ -25,6 +26,7 @@ export function Select(props: SelectPropsType) {
 			name={props.name}
 			onChange={selectHandler}
 			value={selectValue}
+			required={props.required}
 		>
 			{props.children}
 		</select>

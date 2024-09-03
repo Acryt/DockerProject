@@ -1,6 +1,6 @@
 import classes from "./TableContainer.module.scss";
 
-import { CategoryType, StateType } from "../../Utilites/Types";
+import { CandidateType, CategoryType, TicketType } from "../../Utilites/Types";
 import Select from "../../Atoms/Select/Select";
 import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
@@ -8,77 +8,69 @@ import Input from "../../Atoms/Input/Input";
 
 type TableContainerPropsType = {
 	children?: React.ReactNode;
-	state: StateType;
+	stateCategory: Array<CategoryType>;
+	stateCandidate: Array<CandidateType>;
+	changeActiveCategory: Function;
 };
 
 export function TableContainer(props: TableContainerPropsType) {
-	const [activeCategoryId, setActiveCategoryId] = useState<string>("");
-	const [inputPass, setInputPass] = useState<string>("");
-	const pass: string = "2dResults";
+	const [activeCategoryId, setActiveCategoryId] = useState<string | undefined>();
+	const [votes, setVotes] = useState<Array<TicketType>>([]);
 
 	useEffect(() => {
-		if (props.state.length > 0) {
-			setActiveCategoryId(props.state[0]._id!);
+		setActiveCategoryId(props.stateCategory !== undefined && props.stateCategory.length > 0 ? props.stateCategory[0]._id : undefined);
+	}, []);
+
+	useEffect(() => {
+		if (activeCategoryId !== "") {
+			console.log(activeCategoryId);
+			let promise = axios.get("/api/getVote/" + activeCategoryId);
+			promise
+				.then((res: AxiosResponse<any>) => {
+					setVotes(res.data);
+				})
+				.catch((err) => console.log(err.error));
 		}
-	}, [props.state]);
+	}, [activeCategoryId]);
 
 	function selectHandler(e: any) {
 		setActiveCategoryId(e.target.value);
 		console.log(e.target.value);
-	}
+	};
 	function getCandidateName(candidateId: string) {
-		return props.state
-			.find((category) => category._id === activeCategoryId)
-			?.candidates.find((candidate) => candidate._id === candidateId)?.name;
+		return props.stateCandidate.find(
+			(candidate) => candidate._id === candidateId
+		)?.name;
 	}
 
 	return (
 		<div className={classes.TableContainer}>
-			<Select name="table" change={selectHandler}>
-				{props.state.map((category: CategoryType) => (
-					<option value={category._id}>{category.title}</option>
-				))}
-			</Select>
-
-			<input
-				type="text"
-				name="pass"
-				placeholder="Password"
-				value={inputPass}
-				onChange={(e) => setInputPass(e.target.value)}
-			/>
-			{ inputPass === pass ?
-			<table>
-				<thead>
-					<tr>
-						<th>Candidate</th>
-						<th>Votes</th>
-					</tr>
-				</thead>
-				<tbody>
-					{props.state
-						.find((category) => category._id === activeCategoryId)
-						?.candidates.map((candidate) => (
-							<tr>
-								<td>{candidate.name}</td>
-								<td>
-									{
-										props.state
-											.find(
-												(category) =>
-													category._id === activeCategoryId
-											)
-											?.tickets.filter(
-												(ticket) =>
-													ticket.candidateId === candidate._id
-											).length
-									}
-								</td>
-							</tr>
-						))}
-				</tbody>
-			</table> : "" }
 			{props.children}
+				<>
+					<Select name="table" change={selectHandler}>
+						{props.stateCategory !== undefined && props.stateCategory.map((c: CategoryType) => (
+							<option value={c._id}>{c.title}</option>
+						))}
+					</Select>
+					<table>
+						<thead>
+							<tr>
+								<th>Candidate</th>
+								<th>Votes</th>
+							</tr>
+						</thead>
+						<tbody>
+							{props.stateCandidate
+								.filter((ca) => ca.categoryId === activeCategoryId)
+								?.map((c) => (
+									<tr>
+										<td>{c.name}</td>
+										<td>{votes.length}</td>
+									</tr>
+								))}
+						</tbody>
+					</table>
+				</>
 		</div>
 	);
 }

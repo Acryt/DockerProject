@@ -7,12 +7,8 @@ export function Form(props: FormPropsType) {
 
 	function submitHandler(e: any) {
 		e.preventDefault();
-		console.log(e);
-
 		const formData = new FormData(e.target);
 		const b: string = e.nativeEvent.submitter.attributes["value"] ? e.nativeEvent.submitter.attributes["value"].value : undefined;
-		console.log(b);
-
 		const data: any = {};
 
 		for (const [key, value] of Array.from(formData.entries())) {
@@ -25,7 +21,7 @@ export function Form(props: FormPropsType) {
 				data["candidateId"] = b;
 			}
 		}
-
+		console.log(formData);
 		// console.log(data);
 		props.submit(data);
 	}

@@ -2,8 +2,11 @@
 .CategoryCard {
 	display: flex;
 	flex-direction: column;
-	background: $c-tertiary;
+	background: $c-secondary;
+	box-shadow: $shadow;
 	padding: 12px;
 	border-radius: 4px;
 	gap: 12px;
+	width: 200px;
+	justify-content: center;
 }

@@ -1,7 +1,7 @@
 import classes from "./App.module.scss";
 
 // React
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { v4 } from "uuid";
@@ -16,7 +16,6 @@ import Button from "./Atoms/Button/Button";
 import Sidebar from "./Molecules/Sidebar/Sidebar";
 import Center from "./Organisms/Center/Center";
 import CategoryCard from "./Molecules/CategoryCard/CategoryCard";
-import TicketsContainer from "./Organisms/TicketsContainer/TicketsContainer";
 import CategoriesContainer from "./Organisms/CategoriesContainer/CategoriesContainer";
 import CandidatesContainer from "./Organisms/CandidatesContainer/CandidatesContainer";
 import Option from "./Atoms/Option/Option";
@@ -24,215 +23,304 @@ import Input from "./Atoms/Input/Input";
 import Select from "./Atoms/Select/Select";
 import Home from "./Molecules/Home/Home";
 import CandidateCard from "./Molecules/CandidateCard/CandidateCard";
-import TicketCard from "./Molecules/TicketCard/TicketCard";
+// import FileInput from "./Atoms/File/FileInput";
+// import ButtonCandidate from "./Atoms/ButtonCandidate/ButtonCandidate";
+import Dialog from "./Atoms/Dialog/Dialog";
+import TableContainer from "./Organisms/TableContainer/TableContainer";
 
 // Types
 import {
-	StateType,
-	FilterStateType,
-	ActiveCandidate,
+	// 	StateType,
+	// 	FilterStateType,
+	// 	ActiveCandidate,
 	CategoryType,
 	CandidateType,
 	TicketType,
-	PoolType,
+	logsType,
+	// 	PoolType,
 } from "./Utilites/Types";
-import FileInput from "./Atoms/File/FileInput";
-import TableContainer from "./Organisms/TableContainer/TableContainer";
-import ButtonCandidate from "./Atoms/ButtonCandidate/ButtonCandidate";
-import Dialog from "./Atoms/Dialog/Dialog";
+import VoteContainer from "./Organisms/VoteContainer/VoteContainer";
 
 function App() {
-	const [state, setState] = useState<StateType>([]);
-	const [activeCategory, setActiveCategory] = useState<
-		CategoryType | undefined
-	>();
-	const [logs, setLogs] = useState<string[]>(["..."]);
-	const [categoryFilter, setCategoryFilter] = useState<FilterStateType>("all");
-	let filteredState: StateType = state;
-	const [modalState, setModalState] = useState<boolean | undefined>(false);
-	const [delIdCategory, setDelIdCategory] = useState<string>('');
-	const [delIdCandidate, setDelIdCandidate] = useState<string>('');
+	// Base state
+	const [stateCategory, setStateCategory] = useState<Array<CategoryType>>([]);
+	const [stateCandidate, setStateCandidate] = useState<Array<CandidateType>>(
+		[]
+	);
+	// Pass state
+	const [inputPass, setInputPass] = useState<string>("");
+	const pass: string = "2dResults";
+	// Support state
+	const [activeCategory, setActiveCategory] = useState<string | null>(null);
+	const [activeCandidate, setActiveCandidate] = useState<string | null>(null);
+	const [logs, setLogs] = useState<logsType[]>([
+		{ msg: "Test message", err: "Test error" },
+	]);
+	// Modal state
+	const [modalState, setModalState] = useState<boolean>(false);
+	const [title, setTitle] = useState("");
+	const [delIdCategory, setDelIdCategory] = useState<string>("");
+	const [delIdCandidate, setDelIdCandidate] = useState<string>("");
 
 	useEffect(() => {
-		console.log("useEffect");
-		let promise = axios.get("/api/getData");
-		promise
+		console.log("First useEffect");
+		let category = axios.get("/api/getCategory");
+		category
 			.then((res: AxiosResponse<any>) => {
 				if (res.data) {
-					setState(res.data);
-					setActiveCategory(res.data[0] ? res.data[0] : undefined);
+					setStateCategory(res.data);
+					setLogs([...logs, { msg: "Data loaded" }]);
 				}
 			})
-			.then(() => setLogs([...logs, "Data loaded"]))
-			.then(() => console.log("axios done"));
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
+
+		let candidate = axios.get("/api/getCandidate");
+		candidate
+			.then((res: AxiosResponse<any>) => {
+				if (res.data) {
+					setStateCandidate(res.data);
+					setLogs([...logs, { msg: "Data loaded" }]);
+				}
+			})
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
 	}, []);
 
-    useEffect(() => {
-        setState(state);
-        const newCategory = state.find((category) => category._id === activeCategory?._id);
-        setActiveCategory(newCategory);
-    }, [state]);
-
-    function addCategory(category: CategoryType) {
+	function getCategory(id?: string) {
+		if (id) {
+			let promise = axios.get("/api/getCategory/" + id);
+			promise
+				.then((res: AxiosResponse<any>) => {
+					if (res.data) {
+						setActiveCategory(res.data);
+					}
+				})
+				.then(() => setLogs([...logs, { msg: "getCategory with ID done" }]))
+				.catch((err) => {
+					setLogs([
+						...logs,
+						{ err: "Error: " + err.response.data.message },
+					]);
+				});
+		} else {
+			let promise = axios.get("/api/getCategory");
+			promise
+				.then((res: AxiosResponse<any>) => {
+					if (res.data) {
+						setStateCategory(res.data);
+					}
+				})
+				.then(() => setLogs([...logs, { msg: "getCategory done" }]))
+				.catch((err) => {
+					setLogs([
+						...logs,
+						{ err: "Error: " + err.response.data.message },
+					]);
+				});
+		}
+	}
+	function getCandidate(id?: string) {
+		if (id) {
+			let promise = axios.get("/api/getCandidate/" + id);
+			promise
+				.then((res: AxiosResponse<any>) => {
+					if (res.data) {
+						// setStateCandidate(res.data);
+					}
+				})
+				.then(() =>
+					setLogs([...logs, { msg: "getCandidate with ID done" }])
+				)
+				.catch((err) => {
+					setLogs([
+						...logs,
+						{ err: "Error: " + err.response.data.message },
+					]);
+				});
+		} else {
+			let promise = axios.get("/api/getCandidate");
+			promise
+				.then((res: AxiosResponse<any>) => {
+					if (res.data) {
+						setStateCandidate(res.data);
+					}
+				})
+				.catch((err) => {
+					setLogs([
+						...logs,
+						{ err: "Error: " + err.response.data.message },
+					]);
+				});
+		}
+	}
+	function getCandidateName(candidateId: string) {
+		return stateCandidate.find((c) => c._id === candidateId)?.name;
+	}
+	function addCategory(c: CategoryType) {
 		console.log("addCategory");
 		axios
-			.post("/api/addCategory", category)
-			.then((res) => (category = { ...category, _id: res.data._id }))
-			.then(() => setState([...state, category]))
-			.then(() => setActiveCategory(category))
-			.then(() => setLogs([...logs, "Added category " + category.title]))
-			.then(() => console.log("add done id=" + category._id))
-			.catch((err) => setLogs([...logs, "Error: " + err]));
+			.post("/api/addCategory", c)
+			.then((res) => {
+				setStateCategory([...stateCategory, res.data]);
+				setActiveCategory(res.data._id);
+				setLogs([...logs, { msg: "Added category " + res.data.title }]);
+			})
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
 	}
-	function removeCategory(id: string) {
+
+	function rmCategory(id: string) {
 		console.log("removeCategory");
-		const rem = state.find((category) => id === category._id);
-		const s = state.filter((category) => id !== category._id);
+		const rem = stateCategory.find((c) => id === c._id);
+		const s = stateCategory.filter((c) => id !== c._id);
 		axios
-			.delete("/api/deleteCategory", { data: { id: id } })
-			.then(() => setLogs([...logs, "Removed category " + rem?.title]))
-			.then(() => setState(s))
-			.then(() => console.log("rem done id=" + id))
-			.catch((err) => setLogs([...logs, "Error: " + err]));
-		setState(s);
-		setActiveCategory(s[s.length - 1] ? s[s.length - 1] : undefined);
+			.delete("/api/rmCategory", { data: { id: id } })
+			.then(() => {
+				setStateCategory(s);
+				setLogs([...logs, { msg: "Removed category " + rem?.title }]);
+				setActiveCategory(null);
+				getCandidate();
+			})
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
 	}
 
 	function changeActiveCategory(e: any) {
 		console.log("changeActiveCategory");
-		const active = state.find((category) => category._id === e.target.value);
-		if (active) {
-			setActiveCategory(active);
-		} else {
-			console.log("Категория не найдена");
-		}
+		setActiveCategory(e.target.value);
 	}
 
-	async function addCandidate(candidate: CandidateType) {
+	function addCandidate(candidate: CandidateType) {
 		console.log("addCandidate");
-		axios
-			.post("/api/addCandidate", candidate)
-			.then((res) => {
-				const s = state.filter(
-					(category) => category._id !== candidate.categoryId
-				);
-				s.push(res.data! as CategoryType);
-				setState(s);
-			})
-			.then(() => setLogs([...logs, "Added candidate " + candidate.name]))
-			.catch((err) => console.log(err));
-	}
-	async function addPool(pool: PoolType) {
-		console.log("addPool");
-		axios
-			.post("/api/addPool", pool)
-			.then((res) => {
-				const s = state.filter(
-					(category) => category._id !== pool.categoryId
-				);
-				s.push(res.data! as CategoryType);
-				setState(s);
-			})
-			.then(() =>
-				setLogs([...logs, "Added tickets from " + pool.min + " to " + pool.max])
-			)
-			.catch((err) => console.log(err));
-	}
-	function deleteCandidate(categoryId: string, id: string) {
-		console.log("deleteCandidate");
 
 		axios
-			.delete("/api/deleteCandidate", {
+			.post("/api/addCandidate", candidate, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			})
+			.then((res) => {
+				getCandidate();
+				setLogs([...logs, { msg: "Added candidate " + candidate.name }]);
+			})
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
+	}
+	type BatchType = {
+		prefix: string;
+		min: string;
+		max: string;
+	};
+	function addBatch(b: BatchType) {
+		console.log("addBatch");
+		axios
+			.post("/api/addBatch", b)
+			.then(() => {
+				setLogs([
+					...logs,
+					{
+						msg:
+							"Added tickets from " +
+							b.prefix +
+							b.min +
+							" to " +
+							b.prefix +
+							b.max,
+					},
+				]);
+			})
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
+	}
+
+	function rmCandidate(categoryId: string, id: string) {
+		axios
+			.delete("/api/rmCandidate", {
 				data: { categoryId: categoryId, id: id },
 			})
 			.then((res) => {
-				const rem = state
-					.find((category) => category._id === res.data._id)!
-					.candidates.find((candidate) => candidate._id === id);
-				const s = state.filter((category) => category._id !== res.data._id);
-				s.push(res.data! as CategoryType);
-				setLogs([...logs, "Removed candidate " + rem?.name]);
-				setState(s);
+				const s = stateCandidate.filter((c) => c._id !== res.data._id);
+				setLogs([...logs, { msg: "Removed candidate " + res.data.name }]);
+				setStateCandidate(s);
 			})
-			.catch((err) => console.log(err));
-	}
-	function getCandidateName(candidateId: string) {
-		const candidate = state
-			.map((category) => category.candidates)
-			.flat()
-			.find((candidate) => candidate._id === candidateId);
-		return candidate ? candidate.name : undefined;
-	}
-	if (categoryFilter !== "all") {
-		filteredState = state.filter(
-			(category) => category.status === categoryFilter
-		);
-	}
-	function filterCategories(status: FilterStateType) {
-		setCategoryFilter(status);
-		filteredState = state.filter((category) => category.status === status);
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
 	}
 
-	async function addTicket(ticket: TicketType) {
+	function addTicket(ticket: TicketType) {
 		axios
-			.post("/api/addTicket", ticket)
+			.post("/api/addVote", ticket)
 			.then((res) => {
 				console.log(res.data);
-				return res;
-			})
-			.then((res) => {
-				const s = state.filter((category) => category._id !== res.data._id);
-				s.push(res.data! as CategoryType);
-				console.log(s);
-				setState(s);
-				const name = getCandidateName(ticket.candidateId);
 				setLogs([
 					...logs,
-					"Added vote " + ticket.ticket + " for " + name,
+					{
+						msg:
+							"Added vote " +
+							ticket.ticket +
+							" for " +
+							getCandidateName(ticket.candidateId),
+					},
 				]);
+				return res;
 			})
-			.catch((err) => alert(err.response.data.message));
+			.catch((err) => {
+				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+			});
 	}
 
-    const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, state: CategoryType | undefined) => {
-        setActiveCategory(state)
-    };
+	const handleClick = (
+		e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+		state: CategoryType | undefined
+	) => {
+		setActiveCategory(null);
+	};
+
 	return (
 		<div className={classes.App}>
 			<Header title="2D PARTY VOTING SYSTEM" />
 			<Main>
 				<Menu>
 					<hr />
-					<Link className={classes.Link} to="/categories" onClick={(e) => {handleClick(e, undefined)}}>
+					<Link
+						className={classes.Link}
+						to="/categories"
+						onClick={(e) => {
+							handleClick(e, undefined);
+						}}
+					>
 						Categories
 					</Link>
-                    {state[0] && <Link className={classes.Link} to="/candidates" onClick={(e) => {
-                        handleClick(e, state[0])
-                    }}>
-                        Candidates
-                    </Link>}
-					<Link className={classes.Link} to="/votes">
-						Votes
-					</Link>
+					{stateCategory[0] && (
+						<Link
+							className={classes.Link}
+							to="/candidates"
+							onClick={(e) => {
+								handleClick(e, stateCategory[0]);
+							}}
+						>
+							Candidates
+						</Link>
+					)}
+					{stateCandidate[0] && (
+						<Link className={classes.Link} to="/votes">
+							Votes
+						</Link>
+					)}
 					<Link className={classes.Link} to="/tickets">
 						Tickets
 					</Link>
 					<Link className={classes.Link} to="/results">
 						Results
 					</Link>
-					<hr />
-					<Button
-						title="All Categories"
-						click={() => filterCategories("all")}
-					/>
-					<Button
-						title="Active Categories"
-						click={() => filterCategories("active")}
-					/>
-					<Button
-						title="InActive Categories"
-						click={() => filterCategories("inactive")}
-					/>
 				</Menu>
 
 				<Routes>
@@ -254,26 +342,22 @@ function App() {
 										name="title"
 										placeholder="title"
 										value=""
+										required
 									/>
 									<Select name="status">
 										<Option title="active" value="active" />
-										<Option title="inactive" value="inactive" />
+										<Option title="archived" value="archived" />
 									</Select>
-									<Input
-										typeInput="date"
-										name="date"
-										value=""
-										required
-									/>
 									<Button>Add</Button>
 								</Form>
 								<CategoriesContainer>
-									{filteredState.map((category) => (
+									{stateCategory.map((category) => (
 										<CategoryCard key={v4()} category={category}>
 											<Button
 												click={() => {
 													setModalState(true);
-													setDelIdCategory(category._id!)
+													setDelIdCategory(category._id!);
+													setTitle(category.title!);
 												}}
 											>
 												Delete
@@ -281,24 +365,47 @@ function App() {
 										</CategoryCard>
 									))}
 								</CategoriesContainer>
-                                {modalState && (
-                                    <Dialog
-                                        title={
-                                            "Are you sure you want to delete category " +
-                                            state.find((category) => category._id === delIdCategory)?.title +
-                                            "?"
-                                        }
-                                        cancel={() => setModalState(false)}
-                                        ok={() => {
-                                            removeCategory(delIdCategory);
-                                            setModalState(false);
-                                        }}
-                                    />
-                                )}
+								{modalState && (
+									<Dialog
+										key={v4()}
+										title={
+											"Are you sure you want to delete " +
+											title +
+											"?"
+										}
+										cancel={() => setModalState(false)}
+										ok={() => {
+											rmCategory(delIdCategory);
+											setModalState(false);
+										}}
+									/>
+								)}
 							</Center>
 						}
 					/>
-
+					<Route
+						path="/results"
+						element={
+							<Center>
+								<input
+									type="text"
+									name="pass"
+									placeholder="Password"
+									value={inputPass}
+									onChange={(e) => setInputPass(e.target.value)}
+								/>
+								{inputPass === pass ? (
+									<TableContainer
+										stateCandidate={stateCandidate}
+										stateCategory={stateCategory}
+										changeActiveCategory={changeActiveCategory}
+									/>
+								) : (
+									<h1>Wrong password</h1>
+								)}
+							</Center>
+						}
+					/>
 					<Route
 						path="/candidates"
 						element={
@@ -307,9 +414,10 @@ function App() {
 									<Select
 										name="categoryId"
 										change={changeActiveCategory}
+										required
 									>
 										<Option title="Select category" value="" />
-										{state.map((category) => (
+										{stateCategory.map((category) => (
 											<Option
 												key={v4()}
 												title={category.title}
@@ -324,36 +432,54 @@ function App() {
 										value=""
 										required
 									/>
-									<FileInput name="file" value="" />
+									<Input
+										typeInput="file"
+										name="file"
+										placeholder="file"
+										value=""
+									/>
 									<Button>Add</Button>
 								</Form>
 								<CandidatesContainer>
-									{activeCategory && activeCategory.candidates
-										? activeCategory.candidates.map((с) => (
-												<CandidateCard key={v4()} candidate={с}>
-													<Button
-														click={() =>
-														{
-															setModalState(true);
-															setDelIdCandidate(с._id!)
-														}}
+									{stateCandidate && activeCategory
+										? stateCandidate
+												.filter(
+													(с) => с.categoryId === activeCategory
+												)
+												.map((с) => (
+													<CandidateCard
+														key={v4()}
+														candidate={с._id}
+														stateCandidate={stateCandidate}
 													>
-														Delete
-													</Button>
-												</CandidateCard>
-										  ))
+														<Button
+															click={() => {
+																setModalState(true);
+																setDelIdCandidate(с._id!);
+																setTitle(с.name);
+															}}
+														>
+															Delete
+														</Button>
+													</CandidateCard>
+												))
 										: null}
 								</CandidatesContainer>
-                                {modalState && (
-								<Dialog
-									title={"Are you sure you want to delete " + activeCategory?.candidates.find((c) => c._id === delIdCandidate)!.name + "?"}
-								    cancel={() => setModalState(false)}
-                                    ok={() => {
-                                        deleteCandidate(activeCategory!._id!, delIdCandidate);
-                                        setModalState(false);
-                                    }}
-                                    />
-                                )}
+								{modalState && (
+									<Dialog
+										key={v4()}
+										title={
+											"Are you sure you want to delete " +
+											title +
+											"?"
+										}
+										cancel={() => setModalState(false)}
+										ok={() => {
+											rmCandidate(activeCategory!, delIdCandidate);
+											setModalState(false);
+										}}
+									/>
+								)}
 							</Center>
 						}
 					/>
@@ -372,7 +498,7 @@ function App() {
 											change={changeActiveCategory}
 										>
 											<Option title="Select category" value="" />
-											{state.map((category) => (
+											{stateCategory.map((category) => (
 												<Option
 													key={v4()}
 													title={category.title}
@@ -382,53 +508,65 @@ function App() {
 										</Select>
 										<Input
 											typeInput="text"
+											name="prefix"
+											placeholder="Prefix"
+											value=""
+											required
+										/>
+										<Input
+											typeInput="text"
 											name="ticket"
 											placeholder="Ticket"
 											value=""
 											required
 										/>
 									</div>
-									<hr />
-									<div>
-										{activeCategory && activeCategory.candidates
-											? activeCategory.candidates.map((c) => (
-													<Button
-														key={v4()}
-														name="candidateId"
-														value={c._id}
-													>
-														<img src="" />
-														<p>{c.name}</p>
-													</Button>
-											  ))
+									<VoteContainer>
+										{stateCandidate && activeCategory
+											? stateCandidate
+													.filter(
+														(c) => c.categoryId === activeCategory
+													)
+													.map((c) => (
+														<CandidateCard
+															candidate={c._id}
+															stateCandidate={stateCandidate}
+														>
+															<Button
+																name="candidateId"
+																value={c._id}
+															>
+																<p>Vote!</p>
+															</Button>
+														</CandidateCard>
+													))
 											: null}
-									</div>
+									</VoteContainer>
 								</Form>
 							</Center>
 						}
 					/>
-					<Route
-						path="/results"
-						element={<TableContainer state={state} />}
-					/>
+
 					<Route
 						path="/tickets"
 						element={
 							<Center>
-								<Form submit={addPool}>
-									<Select
-										name="categoryId"
-										change={changeActiveCategory}
-									>
-										<Option title="Select category" value="" />
-										{state.map((category) => (
-											<Option
-												key={v4()}
-												title={category.title}
-												value={category._id}
-											/>
-										))}
-									</Select>
+															<input
+							type="text"
+							name="pass"
+							placeholder="Password"
+							value={inputPass}
+							onChange={(e) => setInputPass(e.target.value)}
+						/>
+						{inputPass === pass ? (
+								<Form submit={addBatch}>
+									<Input
+										typeInput="text"
+										name="prefix"
+										placeholder="prefix"
+										value=""
+										required
+									/>
 									<Input
 										typeInput="text"
 										name="min"
@@ -444,8 +582,7 @@ function App() {
 										required
 									/>
 									<Button>Add</Button>
-								</Form>
-								visitors
+								</Form>) : <p>Wrong password</p>}
 							</Center>
 						}
 					/>

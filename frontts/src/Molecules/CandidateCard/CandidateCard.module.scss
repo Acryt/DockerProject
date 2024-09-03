@@ -1,9 +1,50 @@
-@import '../../Utilites/variables';
+@import "../../Utilites/variables";
 .CandidateCard {
 	display: flex;
 	flex-direction: column;
-	background: $c-tertiary;
 	padding: 12px;
 	border-radius: 4px;
 	gap: 12px;
+	background: $c-secondary;
+	box-shadow: $shadow;
+	width: 200px;
+	height: 300px;
+
+	.Img {
+		position: relative;
+		border-radius: 12px;
+		overflow: hidden;
+		width: 100%;
+		height: 200px;
+
+		&::after {
+			content: "";
+			display: block;
+			box-shadow: inset 0px 0px 12px 0px black;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			width: 100%;
+		}
+		img {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+	}
+
+	button {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		width: 100%;
+		padding: 12px;
+		img {
+			width: 48px;
+			height: 48px;
+			background-color: #00ffaa;
+			border-radius: 50%;
+		}
+	}
 }

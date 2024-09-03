@@ -1,18 +1,17 @@
-import classes from "./TicketsContainer.module.scss";
+import classes from "./VoteContainer.module.scss";
 
 type TicketsContainerPropsType = {
 	children?: any
-	
 }
-function TicketsContainer(props: TicketsContainerPropsType) {
+function VoteContainer(props: TicketsContainerPropsType) {
 
 	return (
 		<section className={classes.TicketsContainer}>
-			Tickets
+			Votes
 			<hr/>
 			{props.children}
 		</section>
 	);
 }
 
-export default TicketsContainer;
+export default VoteContainer;

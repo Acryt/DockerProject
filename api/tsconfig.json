@@ -2,8 +2,6 @@
   "compilerOptions": {
     "target": "es6",
     "lib": [
-      "dom",
-      "dom.iterable",
       "esnext"
     ],
     "allowJs": true,
@@ -18,9 +16,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "outDir": "dist",
   },
   "include": [
-    "src",
+    "src"
   ]
 }

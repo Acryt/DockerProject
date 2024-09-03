@@ -1,5 +1,5 @@
 import { FormEventHandler, MouseEventHandler } from "react";
-
+export type logsType = { msg?: string; err?: string };
 export type HeaderPropsType = {
 	title?: string;
 };
@@ -28,7 +28,7 @@ export type MainPropsType = {
 };
 export type SidebarPropsType = {
    children?: any;
-	logs: Array<string>;
+	logs: Array<Object>;
 	setLogs: Function;
 }
 export type ButtonPropsType = {
@@ -44,13 +44,11 @@ export type OptionPropsType = {
 	value?: string;
 }
 
-export type CategoryType = {
+export 	type CategoryType = {
 	_id?: string;
 	title: string;
-	date: Date;
-	status?: StatusType;
-	candidates: [CandidateType];
-	tickets: [TicketType];
+	status: StatusType;
+	comment?: string;
 }
 
 export type ActiveCandidate = string | undefined;
@@ -60,6 +58,9 @@ export type CandidateType = {
 	_id?: string;
 	categoryId: string;
 	name: string;
+	status?: string,
+	file?: any,
+	comment?: string,
 };
 export type PoolType = {
 	_id?: string;
@@ -73,5 +74,5 @@ export type TicketType = {
 	candidateId: string;
 	categoryId: string;
 };
-export type StatusType = "active" | "inactive";
+export type StatusType = "active" | "archived";
 export type FilterStateType = StatusType | "all";

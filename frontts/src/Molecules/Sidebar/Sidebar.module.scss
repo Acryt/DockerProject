@@ -1,19 +1,32 @@
-@import '../../Utilites/variables';
+@import "../../Utilites/variables";
 .Sidebar {
 	background: $c-secondary;
 	color: $c-normal;
 	flex: 0 0 300px;
 	z-index: 3;
 	box-shadow: $shadow;
-	padding: $header+$padding $padding $footer+$padding $padding;
+	padding: $header + $padding $padding $footer + $padding $padding;
+	height: 100vh;
+	overflow-y: auto;
+	position: fixed;
+	right: 0;
+	width: 300px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 
-	button {
-		margin: 12px 0;
+	color: $c-normal;
+
+	hr {
+		margin: 0 0 4px 0;
 	}
-	p {
+	p:not(:first-of-type) {
 		color: $c-disable;
 	}
-	p:first-of-type {
-		color: $c-normal;
-	}
+}
+.success {
+	color: $c-normal;
+}
+.error {
+	color: $c-error !important;
 }
