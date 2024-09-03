@@ -16,7 +16,7 @@ type TableContainerPropsType = {
 export function TableContainer(props: TableContainerPropsType) {
 	const [activeCategoryId, setActiveCategoryId] = useState<string | undefined>();
 	const [votes, setVotes] = useState<Array<TicketType>>([]);
-
+	
 	useEffect(() => {
 		setActiveCategoryId(props.stateCategory !== undefined && props.stateCategory.length > 0 ? props.stateCategory[0]._id : undefined);
 	}, []);
@@ -27,11 +27,30 @@ export function TableContainer(props: TableContainerPropsType) {
 			let promise = axios.get("/api/getVote/" + activeCategoryId);
 			promise
 				.then((res: AxiosResponse<any>) => {
-					setVotes(res.data);
+					const candidateVotes = res.data.reduce((acc: any, vote: any) => {
+						const candidateId = vote.candidateId;
+						const candidateName = getCandidateName(candidateId);
+						const existingCandidate = acc.find((c: any) => c.name === candidateName);
+					 
+						if (existingCandidate) {
+						  existingCandidate.votes++;
+						} else {
+						  acc.push({ name: candidateName, votes: 1 });
+						}
+					 
+						return acc;
+					 }, []).sort((a: any, b: any) => b.votes - a.votes);;
+					 console.log(candidateVotes);
+					 setVotes(candidateVotes);
 				})
 				.catch((err) => console.log(err.error));
 		}
 	}, [activeCategoryId]);
+
+	// Нужно подсчтитать сколько голосов у каждого кандидата в активной категории и запихнуть эти подсчеты в массив имя кандидата и кол-во голосов
+
+
+	
 
 	function selectHandler(e: any) {
 		setActiveCategoryId(e.target.value);
@@ -60,12 +79,10 @@ export function TableContainer(props: TableContainerPropsType) {
 							</tr>
 						</thead>
 						<tbody>
-							{props.stateCandidate
-								.filter((ca) => ca.categoryId === activeCategoryId)
-								?.map((c) => (
+							{votes.map((c:any) => (
 									<tr>
 										<td>{c.name}</td>
-										<td>{votes.length}</td>
+										<td>{c.votes}</td>
 									</tr>
 								))}
 						</tbody>

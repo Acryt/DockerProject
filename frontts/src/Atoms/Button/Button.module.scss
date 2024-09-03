@@ -7,6 +7,11 @@
 	padding: 4px;
 	justify-content: center;
 
+	p {
+		color:#000;
+		font-weight: 700;
+		font-size: 1.25rem;
+	}
 	&:hover {
 		background-color: $c-hover;
 	}

@@ -8,7 +8,7 @@ type DialogPropsType = {
 };
 export function Dialog(props: DialogPropsType) {
 	return (
-		<dialog open>
+		<dialog open className={classes.Dialog}>
 			<p>{props.title}</p>
 			{props.cancel ? <Button click={props.cancel}>Cancel</Button> : ""}
 			{props.ok ? <Button click={props.ok}>Ok</Button> : ""}

@@ -26,28 +26,6 @@ h3 {
   font-size: 1.25rem;
 }
 
-dialog {
-  position: fixed;
-  z-index: 999;
-  margin: auto;
-  top: calc(50% - 25px);
-  padding: 12px;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  background: $glass;
-	box-shadow: $shadow;
-  border: unset;
-	-webkit-backdrop-filter: blur(4px);
-	backdrop-filter: blur(4px);
-  border-radius: 4px;
-  display: flex;
-
-  p {
-    width: 100%;
-  }
-
-}
 .s {
 	font-size: 0.5rem;
 }

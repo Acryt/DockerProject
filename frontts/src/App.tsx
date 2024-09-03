@@ -56,6 +56,7 @@ function App() {
 	const [logs, setLogs] = useState<logsType[]>([
 		{ msg: "Test message", err: "Test error" },
 	]);
+	const [stateFilter, setStateFilter] = useState<string>("");
 	// Modal state
 	const [modalState, setModalState] = useState<boolean>(false);
 	const [title, setTitle] = useState("");
@@ -272,7 +273,8 @@ function App() {
 					{
 						msg:
 							"Added vote " +
-							ticket.prefix.toUpperCase() + ticket.ticket.toUpperCase() + 
+							ticket.prefix.toUpperCase() +
+							ticket.ticket.toUpperCase() +
 							" for " +
 							getCandidateName(ticket.candidateId),
 					},
@@ -294,10 +296,7 @@ function App() {
 			<Main>
 				<Menu>
 					<hr />
-					<Link
-						className={classes.Link}
-						to="/categories"
-					>
+					<Link className={classes.Link} to="/categories">
 						Categories
 					</Link>
 					{stateCategory[0] && (
@@ -312,7 +311,13 @@ function App() {
 						</Link>
 					)}
 					{stateCandidate[0] && (
-						<Link className={classes.Link} to="/votes">
+						<Link
+							className={classes.Link}
+							to="/votes"
+							onClick={() => {
+								handleClick();
+							}}
+						>
 							Votes
 						</Link>
 					)}
@@ -424,7 +429,6 @@ function App() {
 												title={category.title}
 												value={category._id}
 											/>
-											
 										))}
 									</Select>
 									<Input
@@ -439,7 +443,6 @@ function App() {
 										name="file"
 										placeholder="file"
 										value=""
-										required
 									/>
 									<Button>Add</Button>
 								</Form>
@@ -492,16 +495,12 @@ function App() {
 						path="/votes"
 						element={
 							<Center>
-								<Form
-									submit={addVote}
-									className={classes.FormTickets}
-								>
+								<Form submit={addVote} className={classes.FormTickets}>
 									<div>
 										<Select
 											name="categoryId"
 											change={changeActiveCategory}
 										>
-											<Option title="Select category" value="" />
 											{stateCategory.map((category) => (
 												<Option
 													key={v4()}
@@ -510,12 +509,22 @@ function App() {
 												/>
 											))}
 										</Select>
+										<input
+											type="text"
+											name="filter"
+											placeholder="Filter"
+											value={stateFilter}
+											onChange={(e) => {
+												setStateFilter(e.target.value);
+											}}
+										/>
 										<Input
 											typeInput="text"
 											name="prefix"
 											placeholder="Prefix"
 											value=""
 											required
+											key={v4()}
 										/>
 										<Input
 											typeInput="text"
@@ -530,7 +539,13 @@ function App() {
 										{stateCandidate && activeCategory
 											? stateCandidate
 													.filter(
-														(c) => c.categoryId === activeCategory
+														(c) =>
+															c.categoryId === activeCategory &&
+															c.name
+																.toLowerCase()
+																.includes(
+																	stateFilter.toLowerCase()
+																)
 													)
 													.map((c) => (
 														<CandidateCard
