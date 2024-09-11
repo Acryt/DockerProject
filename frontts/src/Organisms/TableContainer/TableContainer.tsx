@@ -16,7 +16,7 @@ type TableContainerPropsType = {
 export function TableContainer(props: TableContainerPropsType) {
 	const [activeCategoryId, setActiveCategoryId] = useState<string | undefined>();
 	const [votes, setVotes] = useState<Array<TicketType>>([]);
-	
+
 	useEffect(() => {
 		setActiveCategoryId(props.stateCategory !== undefined && props.stateCategory.length > 0 ? props.stateCategory[0]._id : undefined);
 	}, []);
@@ -40,7 +40,6 @@ export function TableContainer(props: TableContainerPropsType) {
 					 
 						return acc;
 					 }, []).sort((a: any, b: any) => b.votes - a.votes);;
-					 console.log(candidateVotes);
 					 setVotes(candidateVotes);
 				})
 				.catch((err) => console.log(err.error));
@@ -49,9 +48,7 @@ export function TableContainer(props: TableContainerPropsType) {
 
 	// Нужно подсчтитать сколько голосов у каждого кандидата в активной категории и запихнуть эти подсчеты в массив имя кандидата и кол-во голосов
 
-
 	
-
 	function selectHandler(e: any) {
 		setActiveCategoryId(e.target.value);
 		console.log(e.target.value);

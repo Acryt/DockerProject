@@ -57,6 +57,8 @@ function App() {
 		{ msg: "Test message", err: "Test error" },
 	]);
 	const [stateFilter, setStateFilter] = useState<string>("");
+	const [stateInputPrefix, setStateInputPrefix] = useState<string>("");
+	const [stateInputTicket, setStateInputTicket] = useState<string>("");
 	// Modal state
 	const [modalState, setModalState] = useState<boolean>(false);
 	const [title, setTitle] = useState("");
@@ -518,20 +520,26 @@ function App() {
 												setStateFilter(e.target.value);
 											}}
 										/>
-										<Input
-											typeInput="text"
+										<input
+											type="text"
 											name="prefix"
 											placeholder="Prefix"
-											value=""
-											required
+											value={stateInputPrefix}
+											onChange={(e) => {
+												setStateInputPrefix(e.target.value);
+											}}
 											key={v4()}
+											//137
 										/>
-										<Input
-											typeInput="text"
+										<input
+											type="text"
 											name="ticket"
 											placeholder="Ticket"
-											value=""
 											required
+											value={stateInputTicket}
+											onChange={(e) => {
+												setStateInputTicket(e.target.value);
+											}}
 											key={v4()}
 										/>
 									</div>

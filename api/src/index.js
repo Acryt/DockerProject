@@ -227,9 +227,6 @@ app.post("/addVote", async (req, res) => {
 		if (!req.body.candidateId) {
 			throw new Error("Missing candidateId");
 		}
-		if (!prefix) {
-			throw new Error("Missing prefix of ticket");
-		}
 		if (!ticket) {
 			throw new Error("Missing ticket number");
 		}
