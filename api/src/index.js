@@ -181,6 +181,24 @@ app.get("/getCandidate/:id?", async (req, res) => {
 	}
 });
 
+app.get("/getCandidates/:id?", async (req, res) => {
+	try {
+		const id = req.params.id;
+		let x;
+		if (id) {
+			x = await Candidate.find({ categoryId: id });
+		} else {
+			throw new Error("Missing category id");
+		}
+		if (!x || (Array.isArray(x) && x.length === 0)) {
+			throw new Error("Category has no candidates");
+		}
+		res.send(x);
+	} catch (err) {
+		res.status(400).send({ message: err.message });
+	}
+});
+
 const upload = multer();
 
 app.post("/addCandidate", upload.single("file"), async (req, res, next) => {
