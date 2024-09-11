@@ -219,8 +219,9 @@ app.delete("/rmCandidate", async (req, res) => {
 
 app.post("/addVote", async (req, res) => {
 	try {
-		const prefix = req.body.prefix.toUpperCase();
-		const ticket = prefix + req.body.ticket.toUpperCase();
+		const ticket = (req.body.prefix + req.body.ticket).toUpperCase();
+		const categoryId = req.body.categoryId;
+		const candidateId = req.body.candidateId;
 		if (!req.body.categoryId) {
 			throw new Error("Missing categoryId");
 		}
@@ -236,14 +237,14 @@ app.post("/addVote", async (req, res) => {
 			throw new Error("Ticket not found in Batch");
 		} else {
 			// проверка есть ли такой ticket в Ticket
-			let t = await Ticket.findOne({ ticket: ticket });
+			let t = await Ticket.findOne({ ticket: ticket, categoryId: categoryId });
 			if (t) {
 				throw new Error("You have already voted in this category");
 			} else {
 				const t = new Ticket({
 					ticket: ticket,
-					candidateId: req.body.candidateId,
-					categoryId: req.body.categoryId,
+					categoryId: categoryId,
+					candidateId: candidateId,
 				});
 				const result = await t.save();
 				res.send(result);
