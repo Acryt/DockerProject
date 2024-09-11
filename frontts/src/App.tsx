@@ -346,7 +346,7 @@ function App() {
 							<Center>
 								<Form submit={addCategory}>
 									<Input
-										typeInput="text"
+										type="text"
 										name="title"
 										placeholder="title"
 										value=""
@@ -393,29 +393,6 @@ function App() {
 						}
 					/>
 					<Route
-						path="/results"
-						element={
-							<Center>
-								<input
-									type="text"
-									name="pass"
-									placeholder="Password"
-									value={inputPass}
-									onChange={(e) => setInputPass(e.target.value)}
-								/>
-								{inputPass === pass ? (
-									<TableContainer
-										stateCandidate={stateCandidate}
-										stateCategory={stateCategory}
-										changeActiveCategory={changeActiveCategory}
-									/>
-								) : (
-									<h1>Wrong password</h1>
-								)}
-							</Center>
-						}
-					/>
-					<Route
 						path="/candidates"
 						element={
 							<Center>
@@ -434,14 +411,14 @@ function App() {
 										))}
 									</Select>
 									<Input
-										typeInput="text"
+										type="text"
 										name="name"
 										placeholder="candidate"
 										value=""
 										required
 									/>
 									<Input
-										typeInput="file"
+										type="file"
 										name="file"
 										placeholder="file"
 										value=""
@@ -492,7 +469,6 @@ function App() {
 							</Center>
 						}
 					/>
-
 					<Route
 						path="/votes"
 						element={
@@ -505,42 +481,29 @@ function App() {
 										>
 											{stateCategory.map((category) => (
 												<Option
-													key={v4()}
 													title={category.title}
 													value={category._id}
+													key={v4()}
 												/>
 											))}
 										</Select>
-										<input
+										<Input
 											type="text"
 											name="filter"
 											placeholder="Filter"
 											value={stateFilter}
-											onChange={(e) => {
-												setStateFilter(e.target.value);
-											}}
+											onChange={setStateFilter}
 										/>
-										<input
+										<Input
 											type="text"
 											name="prefix"
 											placeholder="Prefix"
-											value={stateInputPrefix}
-											onChange={(e) => {
-												setStateInputPrefix(e.target.value);
-											}}
-											key={v4()}
-											//137
 										/>
-										<input
+										<Input
 											type="text"
 											name="ticket"
 											placeholder="Ticket"
 											required
-											value={stateInputTicket}
-											onChange={(e) => {
-												setStateInputTicket(e.target.value);
-											}}
-											key={v4()}
 										/>
 									</div>
 									<VoteContainer>
@@ -557,14 +520,14 @@ function App() {
 													)
 													.map((c) => (
 														<CandidateCard
-															key={v4()}
 															candidate={c._id}
 															stateCandidate={stateCandidate}
+															key={v4()}
 														>
 															<Button
-																key={v4()}
 																name="candidateId"
 																value={c._id}
+																key={v4()}
 															>
 																<p>Vote!</p>
 															</Button>
@@ -576,13 +539,12 @@ function App() {
 							</Center>
 						}
 					/>
-
 					<Route
 						path="/tickets"
 						element={
 							<Center>
 								<input
-									type="text"
+									type="password"
 									name="pass"
 									placeholder="Password"
 									value={inputPass}
@@ -591,21 +553,21 @@ function App() {
 								{inputPass === pass ? (
 									<Form submit={addBatch}>
 										<Input
-											typeInput="text"
+											type="text"
 											name="prefix"
 											placeholder="prefix"
 											value=""
 											required
 										/>
 										<Input
-											typeInput="text"
+											type="text"
 											name="min"
 											placeholder="min"
 											value=""
 											required
 										/>
 										<Input
-											typeInput="text"
+											type="text"
 											name="max"
 											placeholder="max"
 											value=""
@@ -615,6 +577,29 @@ function App() {
 									</Form>
 								) : (
 									<p>Wrong password</p>
+								)}
+							</Center>
+						}
+					/>
+					<Route
+						path="/results"
+						element={
+							<Center>
+								<input
+									type="password"
+									name="pass"
+									placeholder="Password"
+									value={inputPass}
+									onChange={(e) => setInputPass(e.target.value)}
+								/>
+								{inputPass === pass ? (
+									<TableContainer
+										stateCandidate={stateCandidate}
+										stateCategory={stateCategory}
+										changeActiveCategory={changeActiveCategory}
+									/>
+								) : (
+									<h1>Wrong password</h1>
 								)}
 							</Center>
 						}

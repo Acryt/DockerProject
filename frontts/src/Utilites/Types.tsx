@@ -15,10 +15,10 @@ export type FormPropsType = {
 };
 export type InputPropsType = {
 	name?: string;
-	typeInput?: string;
+	type?: string;
 	value?: string;
 	placeholder?: string;
-	change?: any
+	onChange?: any
 	required?: boolean;
 	children?: any;
 };

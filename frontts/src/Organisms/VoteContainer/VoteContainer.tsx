@@ -1,10 +1,12 @@
+import React from "react";
 import classes from "./VoteContainer.module.scss";
 
 type TicketsContainerPropsType = {
 	children?: any
 }
-function VoteContainer(props: TicketsContainerPropsType) {
-
+const VoteContainer = React.memo((props: TicketsContainerPropsType) => {
+	console.log("render VoteContainer");
+	
 	return (
 		<section className={classes.TicketsContainer}>
 			Votes
@@ -12,6 +14,6 @@ function VoteContainer(props: TicketsContainerPropsType) {
 			{props.children}
 		</section>
 	);
-}
+})
 
 export default VoteContainer;

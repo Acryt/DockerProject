@@ -1,4 +1,3 @@
-import { v4 } from "uuid";
 import classes from "./Select.module.scss";
 import { useState } from "react";
 

@@ -1,21 +1,23 @@
 import classes from "./Input.module.scss";
 import { InputPropsType } from "../../Utilites/Types";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import React from "react";
 
-export function Input(props: InputPropsType) {
+const Input = React.memo((props: InputPropsType) => {
 	const [stateValue, setStateValue] = useState('');
-
-	function changeHandler(e: any) {
+	console.log('render ' + props.name);
+	
+	const changeHandler = useCallback((e: any) => {
 		console.log("input change");
 		setStateValue(e.target.value);
-		if (props.change) {
-			props.change(e);
+		if (props.onChange) {
+		  props.onChange(e.target.value);
 		}
-	}
+	 }, [props]);
 
 	return (
-		<input className={classes.Input} onChange={changeHandler} value={stateValue} name={props.name} type={props.typeInput} placeholder={props.placeholder} required={props.required}/>
+		<input className={classes.Input} onChange={changeHandler} value={stateValue} name={props.name} type={props.type} placeholder={props.placeholder} required={props.required}/>
 	);
-}
+})
 
 export default Input;

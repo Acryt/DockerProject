@@ -10,6 +10,8 @@ type CandidateCardPropsType = {
 }
 
 export function CandidateCard(props: CandidateCardPropsType) {
+	console.log("CandidateCard render");
+	
 	const с = props.stateCandidate.find((c) => c._id === props.candidate);
 	let img = "";
 	function bufferToBase64(data: any) {
