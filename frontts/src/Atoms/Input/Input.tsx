@@ -5,7 +5,6 @@ import React from "react";
 
 const Input = React.memo((props: InputPropsType) => {
 	const [stateValue, setStateValue] = useState('');
-	console.log('render ' + props.name);
 	
 	const changeHandler = useCallback((e: any) => {
 		console.log("input change");

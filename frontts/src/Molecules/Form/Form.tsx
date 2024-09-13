@@ -21,8 +21,6 @@ export function Form(props: FormPropsType) {
 				data["candidateId"] = b;
 			}
 		}
-		console.log(formData);
-		// console.log(data);
 		props.submit(data);
 	}
 

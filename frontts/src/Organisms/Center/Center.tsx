@@ -4,7 +4,7 @@ import { CenterPropsType } from "../../Utilites/Types";
 import React, { useState } from "react";
 
 const Center = React.memo((props: CenterPropsType) => {
-	console.log("render Center");
+	// console.log("render Center");
 	
 	function handleRemoveClick(e: any, i: number) {
 		console.log("handleRemoveClick");

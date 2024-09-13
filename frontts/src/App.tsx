@@ -1,17 +1,13 @@
 import classes from "./App.module.scss";
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { v4 } from "uuid";
 
 // Types
-import {
-	CategoryType,
-	CandidateType,
-	logsType,
-} from "./Utilites/Types";
+import { CategoryType, CandidateType, logsType } from "./Utilites/Types";
 
 // Components
 import Header from "./Organisms/Header/Header";
@@ -33,6 +29,9 @@ import CandidateCard from "./Molecules/CandidateCard/CandidateCard";
 import Dialog from "./Atoms/Dialog/Dialog";
 import TableContainer from "./Organisms/TableContainer/TableContainer";
 import VoteContainer from "./Organisms/VoteContainer/VoteContainer";
+import { useDispatch, useSelector } from "react-redux";
+import AdminContainer from "./Organisms/AdminContainer/AdminContainer";
+import ResultContainer from "./Organisms/ResultContainer/ResultContainer";
 
 function App() {
 	// Base state
@@ -40,9 +39,12 @@ function App() {
 	const [stateCandidate, setStateCandidate] = useState<Array<CandidateType>>(
 		[]
 	);
+	// const store = useSelector((state: any) => state);
+	// const dispatch = useDispatch();
+
 	// Pass state
-	const [inputPass, setInputPass] = useState<string>("");
-	const pass: string = "2dResults";
+
+
 	// Support state
 	const [activeCategory, setActiveCategory] = useState<string | null>(null);
 	const [logs, setLogs] = useState<logsType[]>([
@@ -56,7 +58,6 @@ function App() {
 	const [delIdCandidate, setDelIdCandidate] = useState<string>("");
 
 	useEffect(() => {
-		console.log("First useEffect");
 		let category = axios.get("/api/getCategory");
 		category
 			.then((res: AxiosResponse<any>) => {
@@ -155,7 +156,7 @@ function App() {
 		return stateCandidate.find((c) => c._id === candidateId)?.name;
 	}
 	function addCategory(c: CategoryType) {
-		console.log("addCategory");
+		// dispatch({ type: "ADD_APPLE", apple: 3 });
 		axios
 			.post("/api/addCategory", c)
 			.then((res) => {
@@ -169,7 +170,6 @@ function App() {
 	}
 
 	function rmCategory(id: string) {
-		console.log("removeCategory");
 		const rem = stateCategory.find((c) => id === c._id);
 		const s = stateCategory.filter((c) => id !== c._id);
 		axios
@@ -186,13 +186,10 @@ function App() {
 	}
 
 	function changeActiveCategory(e: any) {
-		console.log("changeActiveCategory");
 		setActiveCategory(e.target.value);
 	}
 
 	function addCandidate(candidate: CandidateType) {
-		console.log("addCandidate");
-
 		axios
 			.post("/api/addCandidate", candidate, {
 				headers: {
@@ -202,33 +199,6 @@ function App() {
 			.then((res) => {
 				getCandidate();
 				setLogs([...logs, { msg: "Added candidate " + candidate.name }]);
-			})
-			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
-			});
-	}
-	type BatchType = {
-		prefix: string;
-		min: string;
-		max: string;
-	};
-	function addBatch(b: BatchType) {
-		console.log("addBatch");
-		axios
-			.post("/api/addBatch", b)
-			.then(() => {
-				setLogs([
-					...logs,
-					{
-						msg:
-							"Added tickets from " +
-							b.prefix +
-							b.min +
-							" to " +
-							b.prefix +
-							b.max,
-					},
-				]);
 			})
 			.catch((err) => {
 				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
@@ -259,7 +229,6 @@ function App() {
 		axios
 			.post("/api/addVote", ticket)
 			.then((res) => {
-				console.log(res.data);
 				setLogs([
 					...logs,
 					{
@@ -314,7 +283,7 @@ function App() {
 						</Link>
 					)}
 					<Link className={classes.Link} to="/tickets">
-						Tickets
+						Admin Panel
 					</Link>
 					<Link className={classes.Link} to="/results">
 						Results
@@ -531,67 +500,12 @@ function App() {
 					/>
 					<Route
 						path="/tickets"
-						element={
-							<Center>
-								<input
-									type="password"
-									name="pass"
-									placeholder="Password"
-									value={inputPass}
-									onChange={(e) => setInputPass(e.target.value)}
-								/>
-								{inputPass === pass ? (
-									<Form submit={addBatch}>
-										<Input
-											type="text"
-											name="prefix"
-											placeholder="prefix"
-											value=""
-											required
-										/>
-										<Input
-											type="text"
-											name="min"
-											placeholder="min"
-											value=""
-											required
-										/>
-										<Input
-											type="text"
-											name="max"
-											placeholder="max"
-											value=""
-											required
-										/>
-										<Button>Add</Button>
-									</Form>
-								) : (
-									<p>Wrong password</p>
-								)}
-							</Center>
-						}
+						element={<AdminContainer logs={logs} setLogs={setLogs} />}
 					/>
 					<Route
 						path="/results"
 						element={
-							<Center>
-								<input
-									type="password"
-									name="pass"
-									placeholder="Password"
-									value={inputPass}
-									onChange={(e) => setInputPass(e.target.value)}
-								/>
-								{inputPass === pass ? (
-									<TableContainer
-										stateCandidate={stateCandidate}
-										stateCategory={stateCategory}
-										changeActiveCategory={changeActiveCategory}
-									/>
-								) : (
-									<h1>Wrong password</h1>
-								)}
-							</Center>
+							<ResultContainer stateCandidate={stateCandidate} stateCategory={stateCategory} changeActiveCategory={changeActiveCategory} />
 						}
 					/>
 				</Routes>
