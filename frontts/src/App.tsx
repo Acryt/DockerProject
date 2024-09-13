@@ -1,10 +1,17 @@
 import classes from "./App.module.scss";
 
 // React
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import axios, { AxiosResponse } from "axios";
 import { v4 } from "uuid";
+
+// Types
+import {
+	CategoryType,
+	CandidateType,
+	logsType,
+} from "./Utilites/Types";
 
 // Components
 import Header from "./Organisms/Header/Header";
@@ -23,22 +30,8 @@ import Input from "./Atoms/Input/Input";
 import Select from "./Atoms/Select/Select";
 import Home from "./Molecules/Home/Home";
 import CandidateCard from "./Molecules/CandidateCard/CandidateCard";
-// import FileInput from "./Atoms/File/FileInput";
-// import ButtonCandidate from "./Atoms/ButtonCandidate/ButtonCandidate";
 import Dialog from "./Atoms/Dialog/Dialog";
 import TableContainer from "./Organisms/TableContainer/TableContainer";
-
-// Types
-import {
-	// 	StateType,
-	// 	FilterStateType,
-	// 	ActiveCandidate,
-	CategoryType,
-	CandidateType,
-	TicketType,
-	logsType,
-	// 	PoolType,
-} from "./Utilites/Types";
 import VoteContainer from "./Organisms/VoteContainer/VoteContainer";
 
 function App() {
@@ -52,13 +45,10 @@ function App() {
 	const pass: string = "2dResults";
 	// Support state
 	const [activeCategory, setActiveCategory] = useState<string | null>(null);
-	const [activeCandidate, setActiveCandidate] = useState<string | null>(null);
 	const [logs, setLogs] = useState<logsType[]>([
 		{ msg: "Test message", err: "Test error" },
 	]);
 	const [stateFilter, setStateFilter] = useState<string>("");
-	const [stateInputPrefix, setStateInputPrefix] = useState<string>("");
-	const [stateInputTicket, setStateInputTicket] = useState<string>("");
 	// Modal state
 	const [modalState, setModalState] = useState<boolean>(false);
 	const [title, setTitle] = useState("");
