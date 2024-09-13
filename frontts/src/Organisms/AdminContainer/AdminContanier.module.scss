@@ -1,9 +1,0 @@
-@import '../../Utilites/variables';
-.CandidatesContainer {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $padding;
-	justify-content: center;
-	align-items: stretch;
-	width: calc(100vw - 648px);
-}

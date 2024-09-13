@@ -42,9 +42,6 @@ function App() {
 	// const store = useSelector((state: any) => state);
 	// const dispatch = useDispatch();
 
-	// Pass state
-
-
 	// Support state
 	const [activeCategory, setActiveCategory] = useState<string | null>(null);
 	const [logs, setLogs] = useState<logsType[]>([
@@ -56,6 +53,7 @@ function App() {
 	const [title, setTitle] = useState("");
 	const [delIdCategory, setDelIdCategory] = useState<string>("");
 	const [delIdCandidate, setDelIdCandidate] = useState<string>("");
+	const [adminMode, setAdminMode] = useState<boolean>(false);
 
 	useEffect(() => {
 		let category = axios.get("/api/getCategory");
@@ -67,7 +65,7 @@ function App() {
 				}
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				setLogs([...logs, { err: err.response.data.message }]);
 			});
 
 		let candidate = axios.get("/api/getCandidate");
@@ -79,12 +77,33 @@ function App() {
 				}
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				setLogs([...logs, { err: err.response.data.message }]);
 			});
 	}, []);
 	function initCatagory() {
 		if (stateCategory.length > 0) setActiveCategory(stateCategory[0]._id!);
 	}
+	type logsType = {
+		msg?: string;
+		err?: string;
+	};
+	function saveLogsToFile(str: logsType) {
+		const promise = axios.post("/api/setLogs", str);
+		promise
+			.then((res: AxiosResponse<any>) => {
+				if (res.data) {
+					console.log(res.data.message);
+				}
+			})
+			.catch((err) => {
+				console.log("Error: " + err.response.data.message);
+			});
+	}
+	function addLogs(log: logsType) {
+		setLogs([...logs, log]);
+		saveLogsToFile(log);
+	}
+
 	function getCategory(id?: string) {
 		if (id) {
 			let promise = axios.get("/api/getCategory/" + id);
@@ -94,12 +113,11 @@ function App() {
 						setActiveCategory(res.data);
 					}
 				})
-				.then(() => setLogs([...logs, { msg: "getCategory with ID done" }]))
+				.then(() => {
+					addLogs({ msg: "getCategory with ID done" });
+				})
 				.catch((err) => {
-					setLogs([
-						...logs,
-						{ err: "Error: " + err.response.data.message },
-					]);
+					addLogs({ err: err.response.data.message });
 				});
 		} else {
 			let promise = axios.get("/api/getCategory");
@@ -109,12 +127,9 @@ function App() {
 						setStateCategory(res.data);
 					}
 				})
-				.then(() => setLogs([...logs, { msg: "getCategory done" }]))
+				.then(() => addLogs({ msg: "getCategory done" }))
 				.catch((err) => {
-					setLogs([
-						...logs,
-						{ err: "Error: " + err.response.data.message },
-					]);
+					addLogs({ err: err.response.data.message });
 				});
 		}
 	}
@@ -133,7 +148,7 @@ function App() {
 				.catch((err) => {
 					setLogs([
 						...logs,
-						{ err: "Error: " + err.response.data.message },
+						{ err: err.response.data.message },
 					]);
 				});
 		} else {
@@ -147,7 +162,7 @@ function App() {
 				.catch((err) => {
 					setLogs([
 						...logs,
-						{ err: "Error: " + err.response.data.message },
+						{ err: err.response.data.message },
 					]);
 				});
 		}
@@ -162,10 +177,10 @@ function App() {
 			.then((res) => {
 				setStateCategory([...stateCategory, res.data]);
 				setActiveCategory(res.data._id);
-				setLogs([...logs, { msg: "Added category " + res.data.title }]);
+				addLogs({ msg: "Added category " + res.data.title });
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				addLogs({ err: err.response.data.message });
 			});
 	}
 
@@ -176,12 +191,12 @@ function App() {
 			.delete("/api/rmCategory", { data: { id: id } })
 			.then(() => {
 				setStateCategory(s);
-				setLogs([...logs, { msg: "Removed category " + rem?.title }]);
+				addLogs({ msg: "Removed category " + rem?.title });
 				setActiveCategory(null);
 				getCandidate();
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				addLogs({ err: err.response.data.message });
 			});
 	}
 
@@ -198,10 +213,10 @@ function App() {
 			})
 			.then((res) => {
 				getCandidate();
-				setLogs([...logs, { msg: "Added candidate " + candidate.name }]);
+				addLogs({ msg: "Added candidate " + candidate.name });
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				addLogs({ err: err.response.data.message });
 			});
 	}
 
@@ -212,11 +227,11 @@ function App() {
 			})
 			.then((res) => {
 				const s = stateCandidate.filter((c) => c._id !== res.data._id);
-				setLogs([...logs, { msg: "Removed candidate " + res.data.name }]);
+				addLogs({ msg: "Removed candidate " + res.data.name });
 				setStateCandidate(s);
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				addLogs({ err: err.response.data.message });
 			});
 	}
 
@@ -229,21 +244,18 @@ function App() {
 		axios
 			.post("/api/addVote", ticket)
 			.then((res) => {
-				setLogs([
-					...logs,
-					{
-						msg:
-							"Added vote " +
-							ticket.prefix.toUpperCase() +
-							ticket.ticket.toUpperCase() +
-							" for " +
-							getCandidateName(ticket.candidateId),
-					},
-				]);
+				addLogs({
+					msg:
+						"Added vote " +
+						ticket.prefix.toUpperCase() +
+						ticket.ticket.toUpperCase() +
+						" for " +
+						getCandidateName(ticket.candidateId),
+				});
 				return res;
 			})
 			.catch((err) => {
-				setLogs([...logs, { err: "Error: " + err.response.data.message }]);
+				addLogs({ err: err.response.data.message });
 			});
 	}
 
@@ -257,10 +269,12 @@ function App() {
 			<Main>
 				<Menu>
 					<hr />
-					<Link className={classes.Link} to="/categories">
-						Categories
-					</Link>
-					{stateCategory[0] && (
+					{adminMode && (
+						<Link className={classes.Link} to="/categories">
+							Categories
+						</Link>
+					)}
+					{stateCategory[0] && adminMode && (
 						<Link
 							className={classes.Link}
 							to="/candidates"
@@ -500,12 +514,23 @@ function App() {
 					/>
 					<Route
 						path="/tickets"
-						element={<AdminContainer logs={logs} setLogs={setLogs} />}
+						element={
+							<AdminContainer
+								adminMode={adminMode}
+								setAdminMode={setAdminMode}
+								logs={logs}
+								setLogs={setLogs}
+							/>
+						}
 					/>
 					<Route
 						path="/results"
 						element={
-							<ResultContainer stateCandidate={stateCandidate} stateCategory={stateCategory} changeActiveCategory={changeActiveCategory} />
+							<ResultContainer
+								stateCandidate={stateCandidate}
+								stateCategory={stateCategory}
+								changeActiveCategory={changeActiveCategory}
+							/>
 						}
 					/>
 				</Routes>

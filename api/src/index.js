@@ -4,6 +4,7 @@ const { connectDB } = require("./helpers/db");
 const { port, host, db, authApiUrl } = require("./config");
 const app = express();
 const multer = require("multer");
+const fs = require("fs");
 
 const candidateSchema = new mongoose.Schema({
 	name: { type: String },
@@ -60,12 +61,12 @@ app.get("/dropBase", async (req, res) => {
 	}
 });
 app.get("/dropBatch", async (req, res) => {
-   try {
-      await Batch.deleteMany({});
-      res.send("Batch dropped");
-   } catch (err) {
-      res.status(500).send({ message: err.message });
-   }
+	try {
+		await Batch.deleteMany({});
+		res.send("Batch dropped");
+	} catch (err) {
+		res.status(500).send({ message: err.message });
+	}
 });
 app.get("/getCategory/:id?", async (req, res) => {
 	try {
@@ -255,9 +256,12 @@ app.post("/addVote", async (req, res) => {
 			throw new Error("Ticket not found in Batch");
 		} else {
 			// проверка есть ли такой ticket в Ticket
-			let t = await Ticket.findOne({ ticket: ticket, categoryId: categoryId });
+			let t = await Ticket.findOne({
+				ticket: ticket,
+				categoryId: categoryId,
+			});
 			if (t) {
-				throw new Error("You have already voted in this category");
+				throw new Error(ticket + " already voted in this category");
 			} else {
 				const t = new Ticket({
 					ticket: ticket,
@@ -293,6 +297,31 @@ app.get("/getVote/:id?", async (req, res) => {
 		res.status(400).send({ message: err.message });
 	}
 });
+app.post("/setLogs", async (req, res) => {
+	try {
+		console.log(req.body.msg);
+		const msg = req.body.msg;
+		const err = req.body.err;
+		const date = new Date();
+		const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+		let log = '';
+		if (msg) {
+			log = `[${time}] ${msg}\n`;
+		}
+		if (err) {
+			log = `[${time}] ERROR: ${err}\n`;
+		}
+		fs.appendFile("./logs.txt", log, (err) => {
+			if(err) {
+				throw new Error("Error: " + err);
+			}
+		});
+		res.send({ message: "OK" });
+	} catch (err) {
+		res.status(400).send({ message: err.message });
+	}
+});
+
 // app.delete("/rmVote", async (req, res) => {
 // 	const { categoryId, id } = req.body;
 // 	let category = await Category.findById(categoryId);

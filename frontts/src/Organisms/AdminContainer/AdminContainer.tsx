@@ -9,6 +9,8 @@ import { useRef, useState } from "react";
 type AdminContainerProps = {
 	setLogs: Function;
 	logs: logsType[];
+	adminMode: boolean;
+	setAdminMode: Function;
 	children?: React.ReactNode;
 };
 type BatchType = {
@@ -89,13 +91,18 @@ export default function AdminContainer(props: AdminContainerProps) {
 						/>
 						<Button>Add</Button>
 					</Form>
-					<input
-						ref={ref}
-						type="text"
-						name="pass"
-						placeholder="change pass"
-					/>
-					<button onClick={changePassHandler}>Changer</button>
+					<div className={classes.AdminContainer}>
+						<p>Admin Mode</p>
+						<input
+							type="checkbox"
+							checked={props.adminMode}
+							onChange={(e) => {
+								props.setAdminMode(e.target.checked);
+							}}
+						/>
+						<input ref={ref} type="text" placeholder="Result Pass" />
+						<Button click={changePassHandler}>Set</Button>
+					</div>
 				</>
 			) : (
 				<p>Wrong password</p>
