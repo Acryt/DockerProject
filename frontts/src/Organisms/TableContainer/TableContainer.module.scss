@@ -19,4 +19,22 @@
 		box-shadow: $shadow;
 		border-radius: 4px;
 	}
+
+
+	th,td {
+		font-size: 1.5rem;
+	}
+
+	tr:nth-of-type(even) {
+		background-color: $c-primary;
+	}
+
+	th:not(:last-child),
+	td:not(:last-child) {
+		text-align: left;
+	}
+	th:last-child,
+	td:last-child {
+		text-align: right;
+	}
 }

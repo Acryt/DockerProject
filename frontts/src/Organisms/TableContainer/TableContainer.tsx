@@ -23,12 +23,6 @@ export function TableContainer(props: TableContainerPropsType) {
 	let filteredCandidates: Array<CandidateType> = [];
 
 	useEffect(() => {
-		setActiveCategoryId(
-			props.stateCategory !== undefined && props.stateCategory.length > 0
-				? props.stateCategory[0]._id
-				: undefined
-		);
-
 		let promise = axios.get("/api/getCandidate/");
 		promise
 			.then((res: AxiosResponse<any>) => {
@@ -46,15 +40,24 @@ export function TableContainer(props: TableContainerPropsType) {
 				if (votes) {
 					setVotes(votes);
 				}
+				let x =
+					props.stateCategory !== undefined &&
+					props.stateCategory.length > 0
+						? props.stateCategory[0]._id
+						: undefined;
+				console.log(x);
+				setActiveCategoryId(x);
 			})
 			.catch((err) => console.log(err.error));
 	}, []);
 
 	useEffect(() => {
-		filteredCandidates = candidates.filter((candidate) => candidate.categoryId === activeCategoryId);
+		filteredCandidates = candidates.filter(
+			(candidate) => candidate.categoryId === activeCategoryId
+		);
 		console.log(filteredCandidates);
 		calculateVotes(filteredCandidates, votes);
-	}, [activeCategoryId])
+	}, [activeCategoryId]);
 
 	const calculateVotes = (candidates: Array<Object>, votes: Array<Object>) => {
 		candidates.forEach((c: any) => {
@@ -68,7 +71,7 @@ export function TableContainer(props: TableContainerPropsType) {
 		candidates.sort((a: any, b: any) => b.votes - a.votes);
 		setResults(candidates);
 	};
-	
+
 	function selectHandler(e: any) {
 		setActiveCategoryId(e.target.value);
 		console.log(e.target.value);
@@ -91,13 +94,15 @@ export function TableContainer(props: TableContainerPropsType) {
 				<table>
 					<thead>
 						<tr>
+							<th>#</th>
 							<th>Candidate</th>
 							<th>Votes</th>
 						</tr>
 					</thead>
 					<tbody>
-						{results.map((c: any) => (
+						{results.map((c: any, i: number) => (
 							<tr>
+								<td>{i + 1}.</td>
 								<td>{c.name}</td>
 								<td>{c.votes}</td>
 							</tr>
