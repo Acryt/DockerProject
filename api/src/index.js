@@ -279,7 +279,6 @@ app.post("/addVote", async (req, res) => {
 app.get("/getVote/:id?", async (req, res) => {
 	try {
 		const id = req.params.id;
-		console.log("idCy: " + id);
 		if (id) {
 			let x = await Ticket.find({ categoryId: id });
 			if (!x || (Array.isArray(x) && x.length === 0)) {
@@ -299,11 +298,11 @@ app.get("/getVote/:id?", async (req, res) => {
 });
 app.post("/setLogs", async (req, res) => {
 	try {
-		console.log(req.body.msg);
+
 		const msg = req.body.msg;
 		const err = req.body.err;
 		const date = new Date();
-		const time = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+		const time = `${String(date.getHours()).padStart(2, '0')}.${String(date.getMinutes()).padStart(2, '0')}.${String(date.getSeconds()).padStart(2, '0')}`;
 		let log = '';
 		if (msg) {
 			log = `[${time}] ${msg}\n`;
@@ -311,6 +310,7 @@ app.post("/setLogs", async (req, res) => {
 		if (err) {
 			log = `[${time}] ERROR: ${err}\n`;
 		}
+		console.log(log);
 		fs.appendFile("./logs.txt", log, (err) => {
 			if(err) {
 				throw new Error("Error: " + err);
