@@ -9,7 +9,7 @@ import Input from "../../Atoms/Input/Input";
 type TableContainerPropsType = {
 	children?: React.ReactNode;
 	stateCategory: Array<CategoryType>;
-	stateCandidate: Array<CandidateType>;
+	stateCandidate: Array<CandidateType>; // удалить
 	changeActiveCategory: Function;
 };
 
@@ -20,6 +20,7 @@ export function TableContainer(props: TableContainerPropsType) {
 	const [votes, setVotes] = useState<Array<TicketType>>([]);
 	const [candidates, setCandidates] = useState<Array<CandidateType>>([]);
 	const [results, setResults] = useState<any>([]);
+	let filteredCandidates: Array<CandidateType> = [];
 
 	useEffect(() => {
 		setActiveCategoryId(
@@ -27,64 +28,54 @@ export function TableContainer(props: TableContainerPropsType) {
 				? props.stateCategory[0]._id
 				: undefined
 		);
+
+		let promise = axios.get("/api/getCandidate/");
+		promise
+			.then((res: AxiosResponse<any>) => {
+				const candidates = res.data;
+				if (candidates) {
+					setCandidates(candidates);
+				}
+			})
+			.catch((err) => console.log(err.error));
+
+		promise = axios.get("/api/getVote/");
+		promise
+			.then((res: AxiosResponse<any>) => {
+				const votes = res.data;
+				if (votes) {
+					setVotes(votes);
+				}
+			})
+			.catch((err) => console.log(err.error));
 	}, []);
 
 	useEffect(() => {
-		if (activeCategoryId !== "") {
-			console.log(activeCategoryId);
-			let promise = axios.get("/api/getVote/" + activeCategoryId);
-			promise
-				.then((res: AxiosResponse<any>) => {
-					const votes = res.data;
-					if (votes) {
-						setVotes(votes);
-					}
-				})
-				.catch((err) => console.log(err.error));
+		filteredCandidates = candidates.filter((candidate) => candidate.categoryId === activeCategoryId);
+		console.log(filteredCandidates);
+		calculateVotes(filteredCandidates, votes);
+	}, [activeCategoryId])
 
-			promise = axios.get("/api/getCandidates/" + activeCategoryId);
-			promise
-				.then((res: AxiosResponse<any>) => {
-					const candidates = res.data;
-					if (candidates) {
-						setCandidates(candidates);
-					}
-				})
-				.catch((err) => console.log(err.error));
-		}
-	}, [activeCategoryId]);
-
-	const calculateVotes = useCallback((
-		candidates: Array<Object>,
-		votes: Array<Object>
-	) => {
+	const calculateVotes = (candidates: Array<Object>, votes: Array<Object>) => {
 		candidates.forEach((c: any) => {
 			c.votes = 0;
 			votes.forEach((v: any) => {
-				if (c._id === v.candidateId) {
+				if (c._id === v.candidateId && c.categoryId === v.categoryId) {
 					c.votes = c.votes + 1;
 				}
 			});
 		});
 		candidates.sort((a: any, b: any) => b.votes - a.votes);
 		setResults(candidates);
-		console.log(candidates);
-	}, [candidates, votes]);
-
-	useEffect(() => {
-		calculateVotes(candidates, votes);
-	}, [activeCategoryId]);
-
-	// Нужно подсчтитать сколько голосов у каждого кандидата в активной категории и запихнуть эти подсчеты в массив имя кандидата и кол-во голосов
-
+	};
+	
 	function selectHandler(e: any) {
 		setActiveCategoryId(e.target.value);
 		console.log(e.target.value);
 	}
 	function getCandidateName(candidateId: string) {
-		return props.stateCandidate.find(
-			(candidate) => candidate._id === candidateId
-		)?.name;
+		return candidates.find((candidate) => candidate._id === candidateId)
+			?.name;
 	}
 
 	return (
@@ -105,7 +96,7 @@ export function TableContainer(props: TableContainerPropsType) {
 						</tr>
 					</thead>
 					<tbody>
-						{results.map((c:any) => (
+						{results.map((c: any) => (
 							<tr>
 								<td>{c.name}</td>
 								<td>{c.votes}</td>
