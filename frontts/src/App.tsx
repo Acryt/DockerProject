@@ -534,7 +534,7 @@ function App() {
 						}
 					/>
 				</Routes>
-				<Sidebar logs={logs} setLogs={setLogs} />
+				<Sidebar adminMode={adminMode} logs={logs} setLogs={setLogs} />
 			</Main>
 			<Footer />
 		</div>

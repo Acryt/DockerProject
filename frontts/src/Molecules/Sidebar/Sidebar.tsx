@@ -7,6 +7,7 @@ type SidebarPropsType = {
 	children?: any;
 	logs: Array<logsType>;
 	setLogs: Function;
+	adminMode: boolean;
 };
 function Sidebar(props: SidebarPropsType) {
 	function handleRemoveClick(e: any) {
@@ -15,21 +16,21 @@ function Sidebar(props: SidebarPropsType) {
 
 	return (
 		<aside className={classes.Sidebar}>
-				<h3>Logs</h3>
-            <hr/>
-				<Button click={handleRemoveClick}>Clear</Button>
-				{props.logs
-					.slice()
-					.reverse()
-					.map((log, index) => (
-						<p
-							key={index}
-							className={log.err ? classes.error : classes.success}
-						>
-							{log.err ? `${log.err}` : log.msg}
-						</p>
-					))}
-				{props.children}
+			<h3>Logs</h3>
+			<hr />
+			{props.adminMode && <Button click={handleRemoveClick}>Clear</Button>}
+			{props.logs
+				.slice()
+				.reverse()
+				.map((log, index) => (
+					<p
+						key={index}
+						className={log.err ? classes.error : classes.success}
+					>
+						{log.err ? `${log.err}` : log.msg}
+					</p>
+				))}
+			{props.children}
 		</aside>
 	);
 }
