@@ -6,6 +6,8 @@ import classes from "./AdminContainer.module.scss";
 import axios from "axios";
 import { logsType } from "../../Utilites/Types";
 import { useRef, useState } from "react";
+import Dialog from "../../Atoms/Dialog/Dialog";
+import { v4 } from "uuid";
 type AdminContainerProps = {
 	setLogs: Function;
 	logs: logsType[];
@@ -21,6 +23,8 @@ type BatchType = {
 export default function AdminContainer(props: AdminContainerProps) {
 	const [inputPass, setInputPass] = useState<string>("");
 	const ref = useRef<HTMLInputElement>(null);
+	let [title, setTitle] = useState<string>("");
+	let [drop, setDrop] = useState<string>("");
 
 	const adminPass = "admin";
 
@@ -102,7 +106,75 @@ export default function AdminContainer(props: AdminContainerProps) {
 						/>
 						<input ref={ref} type="text" placeholder="Result Pass" />
 						<Button click={changePassHandler}>Set</Button>
+						<div className={classes.AdminContainer_btns}>
+							<Button
+								click={() => {
+									setDrop("votes");
+									setTitle("Are you sure you want to drop all votes?");
+								}}
+							>
+								Drop Votes
+							</Button>
+							<Button
+								click={() => {
+									setDrop("tickets");
+									setTitle(
+										"Are you sure you want to drop all Tickets from Batch?"
+									);
+								}}
+							>
+								Drop Batch
+							</Button>
+							<Button
+								click={() => {
+									setDrop("db");
+									drop = "db";
+									setTitle("Are you sure you want to drop DB?");
+								}}
+							>
+								Drop DB
+							</Button>
+						</div>
 					</div>
+					{drop && (
+						<Dialog
+							key={v4()}
+							title={"Are you sure you want to delete " + title + "?"}
+							cancel={() => setDrop("")}
+							ok={() => {
+								switch (drop) {
+									case "votes":
+										fetch("/api/dropVotes", {
+											method: "GET",
+										})
+											.then((response) => response.json())
+											.then((data) => console.log(data))
+											.catch((error) => console.error(error));
+										break;
+									case "tickets":
+										fetch("/api/dropBatch", {
+											method: "GET",
+										})
+											.then((response) => response.json())
+											.then((data) => console.log(data))
+											.catch((error) => console.error(error));
+										break;
+									case "db":
+										fetch("/api/dropBase", {
+											method: "GET",
+										})
+											.then((response) => response.json())
+											.then((data) => console.log(data))
+											.catch((error) => console.error(error));
+										break;
+
+									default:
+										break;
+								}
+								setDrop("");
+							}}
+						/>
+					)}
 				</>
 			) : (
 				<p>Wrong password</p>

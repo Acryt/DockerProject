@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
 app.get("/dropBase", async (req, res) => {
 	try {
 		await mongoose.connection.dropDatabase();
-		res.send("DB dropped");
+		res.send({ message: "DB dropped" });
 	} catch (err) {
 		res.status(500).send({ message: err.message });
 	}
@@ -63,7 +63,15 @@ app.get("/dropBase", async (req, res) => {
 app.get("/dropBatch", async (req, res) => {
 	try {
 		await Batch.deleteMany({});
-		res.send("Batch dropped");
+		res.send({ message: "Batch dropped" });
+	} catch (err) {
+		res.status(500).send({ message: err.message });
+	}
+});
+app.get("/dropVotes", async (req, res) => {
+	try {
+		await Ticket.deleteMany({});
+		res.send({ message: "Votes dropped" });
 	} catch (err) {
 		res.status(500).send({ message: err.message });
 	}
@@ -298,12 +306,13 @@ app.get("/getVote/:id?", async (req, res) => {
 });
 app.post("/setLogs", async (req, res) => {
 	try {
-
 		const msg = req.body.msg;
 		const err = req.body.err;
 		const date = new Date();
-		const time = `${String(date.getHours()).padStart(2, '0')}.${String(date.getMinutes()).padStart(2, '0')}.${String(date.getSeconds()).padStart(2, '0')}`;
-		let log = '';
+		const time = `${String(date.getHours()).padStart(2, "0")}.${String(
+			date.getMinutes()
+		).padStart(2, "0")}.${String(date.getSeconds()).padStart(2, "0")}`;
+		let log = "";
 		if (msg) {
 			log = `[${time}] ${msg}\n`;
 		}
@@ -312,7 +321,7 @@ app.post("/setLogs", async (req, res) => {
 		}
 		console.log(log);
 		fs.appendFile("./logs.txt", log, (err) => {
-			if(err) {
+			if (err) {
 				throw new Error("Error: " + err);
 			}
 		});

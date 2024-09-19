@@ -17,6 +17,13 @@
   		margin-right: auto;
 	}
 	button {
-		width: 40px;
+		// width: 40px;
+	}
+
+	&_btns {
+		display: flex;
+		justify-content: space-between;
+		gap: 8px;
+		width: 100%;
 	}
 }

@@ -28,12 +28,14 @@ export default function ResultContainer(props: ResultContainerPropsType) {
 			placeholder="Password"
 			onChange={passwordHandler}
 		/>
-		{pass === currentValidPass && (
+		{pass === currentValidPass ? (
 			<TableContainer
 				stateCandidate={props.stateCandidate}
 				stateCategory={props.stateCategory}
 				changeActiveCategory={props.changeActiveCategory}
 			/>
+		) : (
+			<p>Wrong password</p>
 		)}
 	</Center>
 	)
