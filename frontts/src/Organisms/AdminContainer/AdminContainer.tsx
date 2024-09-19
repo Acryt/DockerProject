@@ -9,7 +9,7 @@ import { useRef, useState } from "react";
 import Dialog from "../../Atoms/Dialog/Dialog";
 import { v4 } from "uuid";
 type AdminContainerProps = {
-	setLogs: Function;
+	addLogs: Function;
 	logs: logsType[];
 	adminMode: boolean;
 	setAdminMode: Function;
@@ -33,7 +33,7 @@ export default function AdminContainer(props: AdminContainerProps) {
 		axios
 			.post("/api/addBatch", b)
 			.then(() => {
-				props.setLogs([
+				props.addLogs([
 					...props.logs,
 					{
 						msg:
@@ -47,8 +47,7 @@ export default function AdminContainer(props: AdminContainerProps) {
 				]);
 			})
 			.catch((err) => {
-				props.setLogs([
-					...props.logs,
+				props.addLogs([
 					{ err: "Error: " + err.response.data.message },
 				]);
 			});
@@ -123,12 +122,11 @@ export default function AdminContainer(props: AdminContainerProps) {
 									);
 								}}
 							>
-								Drop Batch
+								Drop Tickets
 							</Button>
 							<Button
 								click={() => {
 									setDrop("db");
-									drop = "db";
 									setTitle("Are you sure you want to drop DB?");
 								}}
 							>
@@ -139,7 +137,7 @@ export default function AdminContainer(props: AdminContainerProps) {
 					{drop && (
 						<Dialog
 							key={v4()}
-							title={"Are you sure you want to delete " + title + "?"}
+							title={title}
 							cancel={() => setDrop("")}
 							ok={() => {
 								switch (drop) {
@@ -148,24 +146,24 @@ export default function AdminContainer(props: AdminContainerProps) {
 											method: "GET",
 										})
 											.then((response) => response.json())
-											.then((data) => console.log(data))
-											.catch((error) => console.error(error));
+											.then(() => props.addLogs({msg: "All Votes Dropped"}))
+											.catch((error) => props.addLogs(error));
 										break;
 									case "tickets":
 										fetch("/api/dropBatch", {
 											method: "GET",
 										})
 											.then((response) => response.json())
-											.then((data) => console.log(data))
-											.catch((error) => console.error(error));
+											.then(() => props.addLogs({msg: "Tickets Dropped"}))
+											.catch((error) => props.addLogs(error));
 										break;
 									case "db":
 										fetch("/api/dropBase", {
 											method: "GET",
 										})
 											.then((response) => response.json())
-											.then((data) => console.log(data))
-											.catch((error) => console.error(error));
+											.then(() => props.addLogs({msg: "All DB Dropped"}))
+											.catch((error) => props.addLogs(error));
 										break;
 
 									default:

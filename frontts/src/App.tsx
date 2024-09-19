@@ -519,7 +519,7 @@ function App() {
 								adminMode={adminMode}
 								setAdminMode={setAdminMode}
 								logs={logs}
-								setLogs={setLogs}
+								addLogs={addLogs}
 							/>
 						}
 					/>
